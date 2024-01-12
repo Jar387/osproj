@@ -1,4 +1,9 @@
+#include <asm/cpuins.h>
+#include <drivers/char.h>
+
 void kmain(){
-	char* vram = (char*)0xc00b8000;
-	*vram = 'K';
+	cwrite(0, "hello", 5);
+	for(;;){
+		hlt();
+	}
 }

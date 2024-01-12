@@ -1,7 +1,8 @@
-LIBOBJS = kernel/kernel.o
+LIBOBJS = kernel/kernel.o drivers/drivers.o
 
 kernel.out: Makefile link.ld Makefile.in
-	make -C kernel kernel.o
+	make -C kernel
+	make -C drivers
 	$(LD) $(TARGETFLAGS) $(LIBOBJS)
 
 .PHONY: run
