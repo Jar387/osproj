@@ -1,4 +1,4 @@
-OBJS = head.o main.o
+OBJS = head.o main.o cpu.o
 INCDIR = ../include
 
 kernel.o: $(OBJS)

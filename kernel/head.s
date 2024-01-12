@@ -58,7 +58,6 @@ creatloop:
 	movl %cr0, %eax
 	orl $0x80000000, %eax # PG enable
 	movl %eax, %cr0
-	xchg %bx, %bx
 	lea 2f, %ecx
 	jmp *%ecx
 
@@ -70,7 +69,6 @@ creatloop:
 	movl %cr3, %eax
 	movl %eax, %cr3
 	mov $stack_top, %esp
-	xchg %bx, %bx
 
 	call kmain
 	cli
