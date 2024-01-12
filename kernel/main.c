@@ -1,4 +1,4 @@
 void kmain(){
-	char* vram = (char*)0xb8000;
+	char* vram = (char*)0xc00b8000;
 	*vram = 'K';
 }

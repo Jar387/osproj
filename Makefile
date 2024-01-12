@@ -6,13 +6,13 @@ kernel.out: Makefile link.ld Makefile.in
 
 .PHONY: run
 run: kernel.out
-	cp kernel.out mnt/boot
+	cp kernel.out mnt/
 	sync
-	qemu-system-i386 -hda rawImage
+	qemu-system-i386 -hda disk.img
 
 .PHONY: debug
 debug: kernel.out
-	cp kernel.out mnt/boot
+	cp kernel.out mnt/
 	sync
 	bochs
 
