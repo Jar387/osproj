@@ -28,7 +28,95 @@ static void step_cursor(){
 	move_cursor(x, y);
 }
 
-static void put_char(char c){
+static void scrup(){
+	char* dst = (char*)(VRAM);
+	char* src = (char*)(VRAM+2*80);
+	char c;
+	while(src!=(char*)(VRAM+2*80*25)){
+		c=*src;
+		*dst=c;
+		src++;
+		dst++;
+	}
+	for(int i=0;i<80;i++){
+		*dst = '\0';
+		dst+=2;
+	}
+}
+
+static void linebreak(){
+	x = 0;
+	if(y==24){
+		scrup();
+	}else{
+		y++;
+
+	}
+	move_cursor(x, y);
+}
+
+static void cls(){
+	char* dst = (char*)(VRAM);
+	for(int i=0;i<80*25;i++){
+		*dst = '\0';
+		dst+=2;
+	}
+}
+
+int vga_text_readc(char* c){
+	return -1;
+}
+
+int vga_text_writec(char c){
+	switch(c){
+	case '\a':
+		// TODO: PC speaker
+		return;
+	case '\b':
+		if(x==0){
+			if(y==0){
+				return;
+			}
+			y--;
+			x=79;
+			move_cursor(x,y);
+			return;
+		}
+		x--;
+		move_cursor(x,y);
+		return;
+	case '\f':
+		cls();
+		x=0;
+		y=0;
+		move_cursor(x,y);
+		return;
+	case '\n':
+		linebreak();
+		return;
+	case '\r':
+		x=0;
+		move_cursor(x,y);
+		return;
+	case '\t':
+		for(int i=0;i<4;i++){
+			vga_text_writec('\0');
+		}
+		return;
+	case '\v':
+		if(y==24){
+			scrup();
+			return;
+		}
+		y++;
+		move_cursor(x,y);
+		return;
+	}
+	if(y==24&&x==79){
+		// need scrup
+		x=0;
+		scrup();
+	}
 	int pos = y*80+x;
 	pos*=2;
 	char* vram = (char*)VRAM; // TODO: replace with phy2virt
@@ -42,6 +130,6 @@ int vga_text_read(char* buf, int count){
 
 int vga_text_write(char* buf, int count){
 	for(int i=0;i<count;i++){
-		put_char(buf[i]);
+		vga_text_writec(buf[i]);
 	}
 }

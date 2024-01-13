@@ -1,3 +1,8 @@
+// 80686 cpu internal data structure
+// pae PSE PG PE nx MMX xmm sse
+
+// segment part
+
 #define MAGIC 0xc
 
 #define R 0x1
@@ -15,12 +20,14 @@
 #define INTR_GATE 0xe
 #define TRAP_GATE 0xf
 
-struct xdtr{
+#define PDT_BASE 0xc0000000
+
+struct xdtr{ // '?dtr'(gdtr, idtr, ldtr, tr...)
 	unsigned short limit;
 	void* addr;
 }__attribute__((packed));
 
-struct segment_desc{
+struct segment_desc{ // in gdt and ldt
 	unsigned short limitlow;
 	unsigned short baselow;
 	unsigned char basemid;
@@ -33,7 +40,7 @@ struct segment_desc{
 	unsigned char basehigh : 4;
 }__attribute__((packed));
 
-struct gate_desc{
+struct gate_desc{ // in idt and tr
 	unsigned short addrlow;
 	unsigned short segment;
 	unsigned char reserve0;
@@ -44,6 +51,52 @@ struct gate_desc{
 	unsigned short addrhigh;
 }__attribute__((packed));
 
+extern void intr_stub();
+
 void arch_init();
 void register_intr(unsigned char num, void* ISR,unsigned short segment , unsigned char dpl);
 void register_trap(unsigned char num, void* ISR,unsigned short segment , unsigned char dpl);
+
+// paging part
+
+struct pde_PSE{
+	unsigned char present : 1;
+	unsigned char RW : 1;
+	unsigned char US : 1;
+	unsigned char PWT : 1; // write through
+	unsigned char PCD : 1; // disable cache
+	unsigned char accessed : 1;
+	unsigned char dirty : 1;
+	unsigned char PSE : 1;
+	unsigned char global : 1;
+	unsigned char avl : 3;
+	unsigned short reserved : 11;
+	unsigned short addr : 10;
+}__attribute__((packed));
+
+struct pde{
+	unsigned char present : 1;
+	unsigned char RW : 1;
+	unsigned char US : 1;
+	unsigned char PWT : 1; // write through
+	unsigned char PCD : 1; // disable cache
+	unsigned char accessed : 1;
+	unsigned char dirty : 1;
+	unsigned char PSE : 1;
+	unsigned char avl : 4;
+	unsigned int addr : 20;
+}__attribute__((packed));
+
+struct pte{
+	unsigned char present : 1;
+	unsigned char RW : 1;
+	unsigned char US : 1;
+	unsigned char PWT : 1; // write through
+	unsigned char PCD : 1; // disable cache
+	unsigned char accessed : 1;
+	unsigned char dirty : 1;
+	unsigned char reserved : 1;
+	unsigned char global : 1;
+	unsigned char avl : 3;
+	unsigned int addr : 20;
+}__attribute__((packed));
