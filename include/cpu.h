@@ -21,6 +21,7 @@
 #define TRAP_GATE 0xf
 
 #define PDT_BASE 0xc0000000
+#define PDT_SIZE 0x1000 // 4KB
 
 struct xdtr{ // '?dtr'(gdtr, idtr, ldtr, tr...)
 	unsigned short limit;
@@ -61,10 +62,10 @@ void register_trap(unsigned char num, void* ISR,unsigned short segment , unsigne
 
 struct pde_PSE{
 	unsigned char present : 1;
-	unsigned char RW : 1;
-	unsigned char US : 1;
-	unsigned char PWT : 1; // write through
-	unsigned char PCD : 1; // disable cache
+	unsigned char rw : 1;
+	unsigned char us : 1;
+	unsigned char pwt : 1; // write through
+	unsigned char pcd : 1; // disable cache
 	unsigned char accessed : 1;
 	unsigned char dirty : 1;
 	unsigned char PSE : 1;
@@ -76,10 +77,10 @@ struct pde_PSE{
 
 struct pde{
 	unsigned char present : 1;
-	unsigned char RW : 1;
-	unsigned char US : 1;
-	unsigned char PWT : 1; // write through
-	unsigned char PCD : 1; // disable cache
+	unsigned char rw : 1;
+	unsigned char us : 1;
+	unsigned char pwt : 1; // write through
+	unsigned char pcd : 1; // disable cache
 	unsigned char accessed : 1;
 	unsigned char dirty : 1;
 	unsigned char PSE : 1;
@@ -89,10 +90,10 @@ struct pde{
 
 struct pte{
 	unsigned char present : 1;
-	unsigned char RW : 1;
-	unsigned char US : 1;
-	unsigned char PWT : 1; // write through
-	unsigned char PCD : 1; // disable cache
+	unsigned char rw : 1;
+	unsigned char us : 1;
+	unsigned char pwt : 1; // write through
+	unsigned char pcd : 1; // disable cache
 	unsigned char accessed : 1;
 	unsigned char dirty : 1;
 	unsigned char reserved : 1;

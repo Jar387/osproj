@@ -7,7 +7,7 @@ typedef struct{
 	int(*read)(char*, int);
 	int(*write)(char*, int);
 	int(*readc)(char*);
-	int(*writec)(char)
+	int(*writec)(char);
 }cdev_t;
 
 // char nodes list

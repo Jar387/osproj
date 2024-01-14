@@ -71,46 +71,46 @@ int vga_text_writec(char c){
 	switch(c){
 	case '\a':
 		// TODO: PC speaker
-		return;
+		return 0;
 	case '\b':
 		if(x==0){
 			if(y==0){
-				return;
+				return 0;
 			}
 			y--;
 			x=79;
 			move_cursor(x,y);
-			return;
+			return 0;
 		}
 		x--;
 		move_cursor(x,y);
-		return;
+		return 0;
 	case '\f':
 		cls();
 		x=0;
 		y=0;
 		move_cursor(x,y);
-		return;
+		return 0;
 	case '\n':
 		linebreak();
-		return;
+		return 0;
 	case '\r':
 		x=0;
 		move_cursor(x,y);
-		return;
+		return 0;
 	case '\t':
 		for(int i=0;i<4;i++){
 			vga_text_writec('\0');
 		}
-		return;
+		return 0;
 	case '\v':
 		if(y==24){
 			scrup();
-			return;
+			return 0;
 		}
 		y++;
 		move_cursor(x,y);
-		return;
+		return 0;
 	}
 	if(y==24&&x==79){
 		// need scrup

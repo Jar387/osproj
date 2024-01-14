@@ -43,7 +43,7 @@ static void setup_idt(){
 }
 
 void register_intr(unsigned char num, void* ISR,unsigned short segment , unsigned char dpl){
-	idt[num].addrlow = (unsigned short)ISR&0xffff;
+	idt[num].addrlow = (unsigned short)((unsigned int)ISR&0xffff);
 	idt[num].segment = segment;
 	idt[num].reserve0 = 0;
 	idt[num].type = INTR_GATE;
@@ -53,7 +53,7 @@ void register_intr(unsigned char num, void* ISR,unsigned short segment , unsigne
 }
 
 void register_trap(unsigned char num, void* ISR,unsigned short segment , unsigned char dpl){
-	idt[num].addrlow = (unsigned short)ISR&0xffff;
+	idt[num].addrlow = (unsigned short)((unsigned int)ISR&0xffff);
 	idt[num].segment = segment;
 	idt[num].reserve0 = 0;
 	idt[num].type = TRAP_GATE;
