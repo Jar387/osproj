@@ -35,7 +35,6 @@ SECTIONS
 		*(.bss)
 	}
 	/* Add a symbol that indicates the end address of the kernel. */
-	_kernel_end = .;
 	.drop BLOCK(4K) : ALIGN(4K)
 	{
 		*(.note.gnu.build-id)
@@ -43,4 +42,5 @@ SECTIONS
 		*(.eh_frame_hdr)
 		*(.comment)
 	}
+	_kernel_end = .;
 }

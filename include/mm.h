@@ -10,6 +10,5 @@ typedef struct{
 }__attribute__((packed)) page_t;
 
 void mm_init(unsigned int memupper, unsigned int memlower);
-void* alloc_a_page(int zone);
-void* phy2virt(void* phy);
-void* virt2phy(void* virt);
+void* palloc(int zone, unsigned int size);
+void pfree(void* virtual, unsigned int size);
