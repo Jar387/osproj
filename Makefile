@@ -1,9 +1,10 @@
 LIBOBJS = kernel/kernel.o drivers/drivers.o mm/mm.o
 
+.PHONY: kernel.out
 kernel.out: Makefile link.ld Makefile.in
-	make -C kernel
-	make -C drivers
-	make -C mm
+	(cd kernel; make)
+	(cd drivers; make)
+	(cd mm; make)
 	$(LD) $(TARGETFLAGS) $(LIBOBJS)  -Xlinker -Map=System.map 
 
 .PHONY: run

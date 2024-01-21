@@ -61,13 +61,13 @@ void register_trap(unsigned char num, void* ISR,unsigned short segment , unsigne
 
 struct pde_PSE{
 	unsigned char present : 1;
-	unsigned char RW : 1;
-	unsigned char US : 1;
-	unsigned char PWT : 1; // write through
-	unsigned char PCD : 1; // disable cache
+	unsigned char rw : 1;
+	unsigned char us : 1;
+	unsigned char pwt : 1; // write through
+	unsigned char pcd : 1; // disable cache
 	unsigned char accessed : 1;
 	unsigned char dirty : 1;
-	unsigned char PSE : 1;
+	unsigned char pse : 1;
 	unsigned char global : 1;
 	unsigned char avl : 3;
 	unsigned short reserved : 11;
@@ -76,23 +76,23 @@ struct pde_PSE{
 
 struct pde{
 	unsigned char present : 1;
-	unsigned char RW : 1;
-	unsigned char US : 1;
-	unsigned char PWT : 1; // write through
-	unsigned char PCD : 1; // disable cache
+	unsigned char rw : 1;
+	unsigned char us : 1;
+	unsigned char pwt : 1; // write through
+	unsigned char pcd : 1; // disable cache
 	unsigned char accessed : 1;
 	unsigned char dirty : 1;
-	unsigned char PSE : 1;
+	unsigned char pse : 1;
 	unsigned char avl : 4;
 	unsigned int addr : 20;
 }__attribute__((packed));
 
 struct pte{
 	unsigned char present : 1;
-	unsigned char RW : 1;
-	unsigned char US : 1;
-	unsigned char PWT : 1; // write through
-	unsigned char PCD : 1; // disable cache
+	unsigned char rw : 1;
+	unsigned char us : 1;
+	unsigned char pwt : 1; // write through
+	unsigned char pcd : 1; // disable cache
 	unsigned char accessed : 1;
 	unsigned char dirty : 1;
 	unsigned char reserved : 1;
