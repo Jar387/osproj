@@ -21,6 +21,7 @@
 #define TRAP_GATE 0xf
 
 #define PDT_BASE 0xc0000000
+#define PDT_SIZE 0x1000 // 4KB
 
 struct xdtr{ // '?dtr'(gdtr, idtr, ldtr, tr...)
 	unsigned short limit;

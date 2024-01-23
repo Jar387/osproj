@@ -70,6 +70,8 @@ creatloop:
 	movl %eax, %cr3
 	mov $stack_top, %esp
 
+	addl $0xc0000000, %ebx
+	pushl %ebx
 	call kmain
 	cli
 1:	hlt

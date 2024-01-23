@@ -11,7 +11,7 @@ kernel.out: Makefile link.ld Makefile.in
 run: kernel.out
 	cp kernel.out mnt/
 	sync
-	qemu-system-i386 -hda disk.img
+	qemu-system-i386 -hda disk.img -no-reboot -no-shutdown
 
 .PHONY: debug
 debug: kernel.out
@@ -23,6 +23,8 @@ debug: kernel.out
 .PHONY: clean
 clean:
 	-rm kernel.out
-	make -C kernel subclean
+	-make -C kernel subclean
+	-make -C mm subclean
+	-make -C drivers subclean
 
 include ./Makefile.in
