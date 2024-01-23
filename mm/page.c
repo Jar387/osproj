@@ -97,10 +97,9 @@ void* palloc(int zone, unsigned int size){
 	return NULL;
 }
 
-void pfree(void* addr, unsigned int len){
-	addr = virt2phy(addr);
+void pfree(void* addr, unsigned int len, unsigned int zone){
 	page_t* ptr;
-	if((unsigned int)addr>0x3fffffff){
+	if(zone==ZONE_USER){
 		// user space
 		ptr = (page_t*)((unsigned int)memmap_user+((unsigned int)addr>>12));
 	}else{ // kernel space

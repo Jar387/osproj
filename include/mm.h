@@ -5,6 +5,8 @@
 #define ZONE_KERNEL 1
 #define ZONE_USER 2
 
+#define NULL (void*)(0)
+
 typedef struct{
 	unsigned char status;
 }__attribute__((packed)) page_t;
@@ -41,7 +43,31 @@ typedef struct SLAB{
 #define KMEM_FLAG_STRICT 2
 
 void mm_init(unsigned int memupper, unsigned int memlower);
+
 void slab_init();
+
 void page_init(unsigned int);
-void* palloc(int zone, unsigned int size);
-void pfree(void* virtual, unsigned int size);
+
+
+void* palloc(int zone, unsigned int size); // kernel zone returns mapped address, \
+										      user zone returns a physical address
+void pfree(void* addr, unsigned int size, unsigned int zone);
+
+
+void* __kmalloc(unsigned int size, unsigned int flags, kmem_cache_t* quickalloc);
+// return a kernel-space mapped address(always use in kernel)
+static inline void* kmalloc(unsigned int size){
+	return __kmalloc(size, KMEM_FLAG_COMFORT, NULL);
+}
+
+static inline void* kmalloc_s(unsigned int size){
+	return __kmalloc(size, KMEM_FLAG_STRICT, NULL);
+}
+
+static inline void* qsmalloc(kmem_cache_t* quickalloc){
+	return __kmalloc(0, KMEM_FLAG_STRICT, quickalloc);
+}
+
+void kfree(void* addr);
+
+kmem_cache_t* query_kmem(unsigned int size);

@@ -14,7 +14,7 @@ static kmem_cache_t kmem_kmem = {
 	.next = NULL
 };
 
-static kmem_cache_t* kmem_t_tail = &kmem_kmem;
+static kmem_cache_t* quick_alloc_table[12];
 
 void* alloc_from_kmem(kmem_cache_t* kmem);
 
@@ -31,8 +31,8 @@ kmem_cache_t* add_kmem(unsigned int obj_size, unsigned int flags){
 	kmem->obj_count_per_slab = (SLAB_SIZE-sizeof(slab_t))/(sizeof(free_t)+obj_size);
 	kmem->flags = flags;
 	kmem->next = NULL;
-	kmem_t_tail->next = kmem;
-	kmem_t_tail = kmem;
+	kmem->next = kmem_kmem.next;
+	kmem_kmem.next = kmem;
 	return kmem;
 }
 
@@ -47,12 +47,57 @@ slab_t* release_slab(void* obj){
 	return slab;
 }
 
-void* __kmalloc(unsigned int size, unsigned int flags){
-	
+kmem_cache_t* query_kmem(unsigned int size){
+	kmem_cache_t* kmem = &kmem_kmem;
+	if(kmem->obj_size==size){
+		return kmem;
+	}
+	while(kmem->obj_size!=size){
+		kmem = kmem->next;
+		if(kmem==NULL){
+			return NULL;
+		}
+	}
+	return kmem;
+}
+
+void* __kmalloc(unsigned int size, unsigned int flags, kmem_cache_t* quickalloc){
+	if(size>SLAB_SIZE/2){
+		return NULL;
+	}
+	kmem_cache_t* kmem;
+	if(flags==KMEM_FLAG_COMFORT){
+		unsigned int sz = size;
+		for(int i=0;i<12;i++){
+			sz>>=1;
+			if(sz==0){
+				kmem = quick_alloc_table[i];
+				break;
+			}
+		}
+		return alloc_from_kmem(kmem);
+	}
+	if(flags==KMEM_FLAG_STRICT){
+		if(quickalloc!=NULL){
+			return alloc_from_kmem(quickalloc);
+		}else{
+			kmem = &kmem_kmem;
+			if(kmem->obj_size==size){
+				return alloc_from_kmem(kmem);
+			}
+			while(kmem->obj_size!=size){
+				kmem = kmem->next;
+				if(kmem==NULL){
+					return NULL;
+				}
+			}
+			return alloc_from_kmem(kmem);
+		}
+	}
 }
 
 void kfree(void* addr){
-	if(addr<0xc0000000){
+	if((unsigned int)addr<0xc0000000){
 		return;
 	}
 	slab_t* slab = release_slab(addr);
@@ -70,6 +115,7 @@ void kfree(void* addr){
 	while(head->next!=slab){
 		head = head->next;
 	}
+	searchfin:
 	head->next = slab->next;
 	if(slab->free_count==slab->parent->obj_count_per_slab){
 		// mov to empty
@@ -153,5 +199,10 @@ void* alloc_from_kmem(kmem_cache_t* kmem){
 }
 
 void slab_init(){
-	// init kmemcache alloctor
+	// init universal kmemcache
+	unsigned int size = 1;
+	for(int i=0;i<12;i++){
+		quick_alloc_table[i] = add_kmem(size, KMEM_FLAG_COMFORT);
+		size<<=1;
+	}
 }
