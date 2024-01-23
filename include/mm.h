@@ -9,20 +9,7 @@ typedef struct{
 	unsigned char status;
 }__attribute__((packed)) page_t;
 
-typedef struct FREE{
-	unsigned int index;
-	struct FREE* next;
-}free_t;
-
-typedef struct SLAB{
-	void* start;
-	unsigned int free_count;
-	free_t* free;
-	struct SLAB* next;
-}slab_t;
-
-#define SLAB_SIZE 4096*NR_SLAB_PAGE
-#define NR_SLAB_PAGE 1
+typedef struct SLAB slab_t;
 
 typedef struct KMEM_CACHE{
 	slab_t* empty_slab;
@@ -31,13 +18,30 @@ typedef struct KMEM_CACHE{
 	unsigned int obj_size;
 	unsigned int obj_count_per_slab;
 	unsigned int flags;
-
 	struct KMEM_CACHE* next;
 }kmem_cache_t;
+
+typedef struct FREE{
+	unsigned int index;
+	struct FREE* next;
+}free_t;
+
+typedef struct SLAB{
+	void* start;
+	unsigned int free_count;
+	kmem_cache_t* parent;
+	free_t* free;
+	struct SLAB* next;
+}slab_t;
+
+#define SLAB_SIZE 4096*NR_SLAB_PAGE
+#define NR_SLAB_PAGE 1
 
 #define KMEM_FLAG_COMFORT 1
 #define KMEM_FLAG_STRICT 2
 
 void mm_init(unsigned int memupper, unsigned int memlower);
+void slab_init();
+void page_init(unsigned int);
 void* palloc(int zone, unsigned int size);
 void pfree(void* virtual, unsigned int size);

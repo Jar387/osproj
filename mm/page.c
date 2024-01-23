@@ -81,9 +81,11 @@ void* palloc(int zone, unsigned int size){
 					head_ptr[i].status = MEM_USED;
 				}
 				if(zone==ZONE_KERNEL){
-					return phy2virt((index-size)<<12);
+					return phy2virt((void*)((index-size)<<12));
 				}
-				return NULL;
+				if(zone==ZONE_USER){
+					return (void*)((index-size)<<12);
+				}
 			}
 			continue;
 		}else{
@@ -91,6 +93,7 @@ void* palloc(int zone, unsigned int size){
 			curr_size = size;
 		}
 	}
+	panic("kernel-space OOM");
 	return NULL;
 }
 
