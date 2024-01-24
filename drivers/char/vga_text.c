@@ -1,4 +1,4 @@
-#include <asm/cpuins.h>
+#include <asm/ring0.h>
 
 #define VRAM 0xc00b8000
 

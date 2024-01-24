@@ -1,4 +1,4 @@
-OBJS = memman.o page.o slab.o
+OBJS = init.o buddy.o slab.o mapping.o
 INCDIR = ../include
 
 mm.o: $(OBJS)

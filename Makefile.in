@@ -5,7 +5,7 @@ AR = i686-linux-gnu-ar
 MERGE = i686-linux-gnu-ld
 
 CCFLAGS = -std=gnu99 -ffreestanding -I $(INCDIR)
-TARGETFLAGS = -T link.ld -o kernel.out -ffreestanding -nostdlib
+TARGETFLAGS = -T link.ld -o kernel.out -ffreestanding -nostdlib -L lib/ -lk
 ARFLAGS = -crs
 
 %.o: %.c

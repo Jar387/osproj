@@ -5,6 +5,7 @@ kernel.out: Makefile link.ld Makefile.in
 	(cd kernel; make)
 	(cd drivers; make)
 	(cd mm; make)
+	(cd lib; make)
 	$(LD) $(TARGETFLAGS) $(LIBOBJS)  -Xlinker -Map=System.map 
 
 .PHONY: run

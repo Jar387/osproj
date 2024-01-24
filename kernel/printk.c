@@ -1,6 +1,5 @@
 #include <drivers/char.h>
 #include <stdarg.h>
-#include <asm/cpuins.h>
 
 #define putchar(c) cwritec(CDEV_VGA, c)
 
@@ -16,8 +15,6 @@ static inline void puthex(unsigned char hex){
 }
 
 static void printhex(int val){
-	putchar('0');
-	putchar('x');
 	for(int i=0;i<8;i++){
 		puthex((val&0xf0000000)>>28);
 		val<<=4;

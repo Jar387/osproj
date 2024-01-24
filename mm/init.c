@@ -1,5 +1,6 @@
 #include <printk.h>
-#include <mm.h>
+#include <slab.h>
+#include <buddy.h>
 
 void mm_init(unsigned int memupper, unsigned int memlower){
 	unsigned int total_mem = ((memupper+1024)&0xfffff800)+2048; // um, it works :)

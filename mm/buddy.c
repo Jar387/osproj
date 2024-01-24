@@ -1,14 +1,5 @@
-#include <cpu.h>
-#include <mm.h>
-#include <printk.h>
+#include <buddy.h>
 #include <stddef.h>
-
-// I don't know why must lea them to access
-// But it works :)
-extern unsigned int _kernel_start;
-extern unsigned int _kernel_end;
-#define KERNEL_START (unsigned int)(&_kernel_start)
-#define KERNEL_END ((unsigned int)(&_kernel_end))-0xc0000000
 
 static page_t* memmap_kernel;
 static page_t* memmap_user;
@@ -21,7 +12,6 @@ static void* phy2virt(void* phy){
 	if((unsigned int)phy<0x40000000){
 		return phy+0xc0000000;
 	}else{
-		// TODO: page translate
 		return NULL;
 	}
 }
@@ -30,7 +20,6 @@ static void* virt2phy(void* virt){
 	if((unsigned int)virt>0xbfffffff){
 		return virt-0xc0000000;
 	}else{
-		// TODO: page translate
 		return NULL;
 	}
 }
@@ -93,7 +82,6 @@ void* palloc(int zone, unsigned int size){
 			curr_size = size;
 		}
 	}
-	panic("kernel-space OOM");
 	return NULL;
 }
 
