@@ -1,7 +1,6 @@
-#include <mm.h>
 #include <stddef.h>
-#include <printk.h>
-#include <asm/cpuins.h>
+#include <slab.h>
+#include <buddy.h>
 
 // alloctor struct stub to allocate allocator
 static kmem_cache_t kmem_kmem = {
@@ -16,13 +15,13 @@ static kmem_cache_t kmem_kmem = {
 
 static kmem_cache_t* quick_alloc_table[12];
 
-void* alloc_from_kmem(kmem_cache_t* kmem);
+static void* alloc_from_kmem(kmem_cache_t* kmem);
 
 static inline kmem_cache_t* alloc_kmem_t(){
 	return (kmem_cache_t*)alloc_from_kmem(&kmem_kmem);
 }
 
-kmem_cache_t* add_kmem(unsigned int obj_size, unsigned int flags){
+static kmem_cache_t* add_kmem(unsigned int obj_size, unsigned int flags){
 	kmem_cache_t* kmem = alloc_kmem_t();
 	kmem->empty_slab = NULL;
 	kmem->partial_slab = NULL;
@@ -36,7 +35,7 @@ kmem_cache_t* add_kmem(unsigned int obj_size, unsigned int flags){
 	return kmem;
 }
 
-slab_t* release_slab(void* obj){
+static slab_t* release_slab(void* obj){
 	slab_t* slab = (slab_t*)((unsigned int)obj&0xfffff000); // slab is page aligned
 	unsigned int index = ((unsigned int)obj-(unsigned int)(slab->start))/(slab->parent->obj_size);
 	free_t* free_arr = slab->free;
@@ -129,7 +128,7 @@ void kfree(void* addr){
 }
 
 
-slab_t* creat_slab(unsigned int obj_count){
+static slab_t* creat_slab(unsigned int obj_count){
 	slab_t* slab = palloc(ZONE_KERNEL, NR_SLAB_PAGE);
 	slab->free_count = obj_count;
 	slab->next = NULL;
@@ -148,7 +147,7 @@ slab_t* creat_slab(unsigned int obj_count){
 	return slab;
 }
 
-void* alloc_from_slab(slab_t* slab, unsigned int obj_size){
+static void* alloc_from_slab(slab_t* slab, unsigned int obj_size){
 	free_t* alloc = slab->free;
 	slab->free = alloc->next;
 	slab->free_count--;
@@ -156,7 +155,7 @@ void* alloc_from_slab(slab_t* slab, unsigned int obj_size){
 	return (void*)((unsigned int)(slab->start)+obj_size*index);
 }
 
-void* alloc_from_kmem(kmem_cache_t* kmem){
+static void* alloc_from_kmem(kmem_cache_t* kmem){
 	slab_t* head = kmem->partial_slab;
 	void* ret;
 	int status = 0; // from partial

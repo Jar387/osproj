@@ -1,4 +1,4 @@
-#include <asm/cpuins.h>
+#include <asm/ring0.h>
 #include <drivers/char.h>
 #include <cpu.h>
 #include <printk.h>
@@ -9,6 +9,7 @@ void kmain(struct multiboot_info* info){
 	arch_init();
 	mm_init(info->mem_upper, info->mem_lower);
 	printk("hardware setup done\n");
+	panic("test");
 	for(;;){
 		hlt();
 	}

@@ -1,5 +1,6 @@
-#include <asm/cpuins.h>
+#include <asm/ring0.h>
 #include <cpu.h>
+#include <interrupt.h>
 
 static struct segment_desc gdt[5];
 static struct xdtr gdtr;
@@ -65,4 +66,22 @@ void register_trap(unsigned char num, void* ISR,unsigned short segment , unsigne
 void arch_init(){
 	setup_gdt();
 	setup_idt();
+	set_int_gate(0, &divide_error);
+	set_int_gate(1, &debug);
+	set_int_gate(2, &nmi);
+	set_system_gate(3, &int3);
+	set_system_gate(4, &overflow);
+	set_system_gate(5, &bounds);
+	set_int_gate(6, &opcode);
+	set_int_gate(7, &device_not_present);
+	set_int_gate(8, &double_fault);
+	set_int_gate(9, &i387_overrun);
+	set_int_gate(10, &illegal_tss);
+	set_int_gate(11, &illegal_segment);
+	set_int_gate(12, &stack_overflow);
+	set_int_gate(13, &general_protect);
+	set_int_gate(14, &page_fault);
+	for(int i=15;i<=0xff;i++){
+		set_int_gate(i, &reserved);
+	}
 }

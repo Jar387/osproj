@@ -1,3 +1,6 @@
+#ifndef CPU_H
+#define CPU_H
+
 // 80686 cpu internal data structure
 // pae PSE PG PE nx MMX xmm sse
 
@@ -46,7 +49,7 @@ struct gate_desc{ // in idt and tr
 	unsigned short segment;
 	unsigned char reserve0;
 	unsigned char type : 4;
-	unsigned char reserve1;
+	unsigned char reserve1 : 1;
 	unsigned char dpl : 2;
 	unsigned char present : 1;
 	unsigned short addrhigh;
@@ -57,6 +60,14 @@ extern void intr_stub();
 void arch_init();
 void register_intr(unsigned char num, void* ISR,unsigned short segment , unsigned char dpl);
 void register_trap(unsigned char num, void* ISR,unsigned short segment , unsigned char dpl);
+
+static inline void set_int_gate(unsigned char num, void* ISR){
+	register_intr(num, ISR, 2<<3, 0);
+}
+
+static inline void set_system_gate(unsigned char num, void* ISR){
+	register_intr(num, ISR, 2<<3, 3);
+}
 
 // paging part
 
@@ -101,3 +112,5 @@ struct pte{
 	unsigned char avl : 3;
 	unsigned int addr : 20;
 }__attribute__((packed));
+
+#endif
