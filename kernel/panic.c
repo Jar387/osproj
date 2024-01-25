@@ -4,7 +4,7 @@ void dump_cpu(){
 	unsigned int eax, ebx, ecx, edx, esi, edi, esp, ebp;
 	unsigned int eip, eflags;
 	unsigned int cs, ds, es, fs, gs, ss;
-	unsigned int cr0, pdbr;
+	unsigned int cr0, cr2, pdbr;
 	__asm__ volatile(
 		"\n"
 		"nop\n"
@@ -26,6 +26,12 @@ void dump_cpu(){
 		);
 	__asm__ volatile(
 		"\n"
+		"movl %%cr2, %%eax\n"
+		: "=a"(cr2)
+		:
+		);
+	__asm__ volatile(
+		"\n"
 		"mov %%cs, %%eax\n"
 		"mov %%ds, %%ebx\n"
 		"mov %%es, %%ecx\n"
@@ -37,11 +43,11 @@ void dump_cpu(){
 		);
 	printk("eax=%x, ebx=%x, ecx=%x, edx=%x\nedi=%x, esi=%x, ebp=%x, esp=%x\n\
 cs=%x, ss=%x, ds=%x, es=%x, fs=%x, gs=%x\n\
-current eip=%x, cr0=%x, cr3=%x\n\
+current eip=%x, cr0=%x, cr2=%x, cr3=%x\n\
 -----------------------------------CALL STACK-----------------------------------", eax, ebx, ecx, edx, \
-	edi, esi, ebp, esp, cs, ss, ds, es, fs, gs, eip, cr0, pdbr);
+	edi, esi, ebp, esp, cs, ss, ds, es, fs, gs, eip, cr0, cr2, pdbr);
 	unsigned int* stack = (unsigned int*)esp;
-	for(int i=0;i<26-7;i++){
+	for(int i=0;i<5;i++){
 		for(int j=0;j<8;j++){
 			printk("%x ", *stack);
 			stack--;
