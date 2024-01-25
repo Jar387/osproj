@@ -28,5 +28,7 @@ clean:
 	-make -C mm subclean
 	-make -C drivers subclean
 	-make -C lib subclean
+	-rm serial.log
+	-rm System.map
 
 include ./Makefile.in
