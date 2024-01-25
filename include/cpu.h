@@ -24,6 +24,7 @@
 #define TRAP_GATE 0xf
 
 #define PDT_BASE 0xc0000000
+#define KERNEL_BASE 0xc0000000
 #define PDT_SIZE 0x1000 // 4KB
 
 struct xdtr{ // '?dtr'(gdtr, idtr, ldtr, tr...)
@@ -62,16 +63,16 @@ void register_intr(unsigned char num, void* ISR,unsigned short segment , unsigne
 void register_trap(unsigned char num, void* ISR,unsigned short segment , unsigned char dpl);
 
 static inline void set_int_gate(unsigned char num, void* ISR){
-	register_intr(num, ISR, 2<<3, 0);
+	register_intr(num, ISR, 1<<3, 0);
 }
 
 static inline void set_system_gate(unsigned char num, void* ISR){
-	register_intr(num, ISR, 2<<3, 3);
+	register_intr(num, ISR, 1<<3, 3);
 }
 
 // paging part
 
-struct pde_PSE{
+typedef struct{
 	unsigned char present : 1;
 	unsigned char rw : 1;
 	unsigned char us : 1;
@@ -82,11 +83,11 @@ struct pde_PSE{
 	unsigned char PSE : 1;
 	unsigned char global : 1;
 	unsigned char avl : 3;
-	unsigned short reserved : 11;
+	unsigned short reserved : 10;
 	unsigned short addr : 10;
-}__attribute__((packed));
+}__attribute__((packed)) huge_pde_t;
 
-struct pde{
+typedef struct{
 	unsigned char present : 1;
 	unsigned char rw : 1;
 	unsigned char us : 1;
@@ -97,9 +98,9 @@ struct pde{
 	unsigned char PSE : 1;
 	unsigned char avl : 4;
 	unsigned int addr : 20;
-}__attribute__((packed));
+}__attribute__((packed)) pde_t;
 
-struct pte{
+typedef struct{
 	unsigned char present : 1;
 	unsigned char rw : 1;
 	unsigned char us : 1;
@@ -111,6 +112,6 @@ struct pte{
 	unsigned char global : 1;
 	unsigned char avl : 3;
 	unsigned int addr : 20;
-}__attribute__((packed));
+}__attribute__((packed)) pte_t;
 
 #endif

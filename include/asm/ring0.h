@@ -34,6 +34,17 @@ static inline void flush_segment(unsigned int cs, unsigned int ds){
        : "eax");
 }
 
+static inline void flush_cr3(){
+    __asm__ volatile (
+        "\n"
+        "movl %%cr3, %%eax\n"
+        "movl %%eax, %%cr3\n"
+        :
+        :
+        : "eax"
+        );
+}
+
 static inline void hlt(){
 	__asm__ volatile ("hlt");
 }

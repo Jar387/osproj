@@ -1,7 +1,7 @@
 OBJS = string.o
 INCDIR = ../include
 
-libk.a: $(OBJS)
-	$(AR) $(ARFLAGS) $@ $^
+lib.o: $(OBJS)
+	$(MERGE) -r $^ -o $@
 
 include ../Makefile.in
