@@ -1,4 +1,4 @@
-OBJS = vga_text.o chardev.o
+OBJS = vga_console.o chardev.o
 INCDIR = ../../include
 
 char.o: $(OBJS)

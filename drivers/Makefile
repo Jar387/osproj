@@ -2,7 +2,7 @@ OBJS = char/char.o
 INCDIR = ../include
 
 drivers.o:
-	make -C char
+	(cd char; make)
 	$(MERGE) -r $(OBJS) -o $@
 
 include ../Makefile.in

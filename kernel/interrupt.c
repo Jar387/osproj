@@ -1,4 +1,5 @@
 #include <printk.h>
+#include <panic.h>
 
 void do_divide_error(){
 	panic("divide error caught");

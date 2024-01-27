@@ -1,7 +1,11 @@
 #include <drivers/char.h>
 #include <stdarg.h>
+#include <asm/ring0.h>
 
-#define putchar(c) cwritec(CDEV_VGA, c)
+static inline void putchar(char c){
+	bp();
+	cwrite(CDEV_STDOUT, &c, 1);
+}
 
 static inline void puthex(unsigned char hex){
 	if(hex>0xf){
