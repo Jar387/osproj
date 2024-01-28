@@ -3,7 +3,6 @@
 #include <asm/ring0.h>
 
 static inline void putchar(char c){
-	bp();
 	cwrite(CDEV_STDOUT, &c, 1);
 }
 
@@ -26,6 +25,10 @@ static void printhex(int val){
 }
 
 static void printint(int val){
+	if(val==0){
+		putchar('0');
+		return;
+	}
 	int power = 10;
 	int i = 0;
 	char buf[10];

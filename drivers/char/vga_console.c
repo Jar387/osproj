@@ -5,7 +5,7 @@
 #include <printk.h>
 #include <stddef.h>
 
-#define VRAM 0xc00b8000
+static int VRAM;
 
 static int x = 0;
 static int y = 0;
@@ -141,7 +141,11 @@ static int vga_console_ioctl(long cmd){
 }
 
 void vga_console_init(struct multiboot_info* info, cdev_t* stdout){
+	VRAM = info->framebuffer_addr+0xc0000000;
 	stdout->read = NULL;
 	stdout->write = &vga_console_write;
 	stdout->ioctl = &vga_console_ioctl;
+	if(info->framebuffer_type!=MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT){
+		printk("VGA card is in graphic mode! will use serial console at COM1\n");
+	}
 }

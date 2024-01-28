@@ -70,6 +70,10 @@ static inline void set_system_gate(unsigned char num, void* ISR){
 	register_intr(num, ISR, 1<<3, 3);
 }
 
+static inline void set_irq_gate(unsigned char irq, void* ISR){
+	register_intr(irq+0x20, ISR, 1<<3, 0);
+}
+
 // paging part
 
 typedef struct{

@@ -4,6 +4,7 @@
 #include <printk.h>
 #include <drivers/char.h>
 #include <mm.h>
+#include <time.h>
 
 void kmain(struct multiboot_info* info){
 	lock_kernel();
@@ -12,6 +13,8 @@ void kmain(struct multiboot_info* info){
 	arch_init();
 	mm_init(info->mem_upper, info->mem_lower);
 	printk("hardware setup done\n");
+	pit_init();
+	unlock_kernel();
 	for(;;){
 		hlt();
 	}

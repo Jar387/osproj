@@ -1,6 +1,7 @@
 #include <asm/ring0.h>
 #include <cpu.h>
 #include <interrupt.h>
+#include <pic.h>
 
 static struct segment_desc gdt[5];
 static struct xdtr gdtr;
@@ -84,4 +85,5 @@ void arch_init(){
 	for(int i=15;i<=0xff;i++){
 		set_int_gate(i, &reserved);
 	}
+	init_8259();
 }

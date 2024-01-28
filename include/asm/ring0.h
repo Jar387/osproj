@@ -1,10 +1,36 @@
+#ifndef RING0_H
+#define RING0_H
+
+static inline void io_wait(){
+    __asm__ volatile ("nop; nop\n");
+}
+
 static inline void outb(unsigned short port, unsigned char data){
 	__asm__ volatile ("outb %%al, %%dx"::"a"(data), "d"(port));
 }
 
+static inline void outb_p(unsigned short port, unsigned char data){
+    outb(port, data);
+    io_wait();
+}
+
 static inline unsigned char inb(unsigned short port){
-	unsigned char result;
-	__asm__ volatile ("inb %%dx":"=a"(result): "d"(port));
+    unsigned char result;
+    __asm__ volatile ("inb %%dx":"=a"(result): "d"(port));
+}
+
+static inline unsigned short inw(unsigned short port){
+	unsigned short result;
+	__asm__ volatile ("inw %%dx":"=a"(result): "d"(port));
+}
+
+static inline void outw(unsigned short port, unsigned short data){
+    __asm__ volatile ("outw %%al, %%dx"::"a"(data), "d"(port));
+}
+
+static inline void outw_p(unsigned short port, unsigned short data){
+    outw(port, data);
+    io_wait();
 }
 
 static inline void lgdt(void* gdt){
@@ -60,3 +86,5 @@ static inline void unlock_kernel(){
 static inline void bp(){
 	__asm__ volatile ("xchgw %bx, %bx");
 }
+
+#endif
