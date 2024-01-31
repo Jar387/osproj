@@ -3,14 +3,17 @@
 #include <interrupt.h>
 #include <pic.h>
 
-static struct segment_desc gdt[5];
+static struct segment_desc gdt[6];
 static struct xdtr gdtr;
 
 static struct gate_desc idt[256];
 static struct xdtr idtr;
 
+static struct xdtr tr;
+struct tss general_tss;
+
 static void setup_gdt(){
-	gdtr.limit = 5*sizeof(struct segment_desc);
+	gdtr.limit = 6*sizeof(struct segment_desc);
 	gdtr.addr = &gdt;
 	int* ptr = (int*)gdt;
 	*ptr = 0;
@@ -44,6 +47,21 @@ static void setup_idt(){
 	lidt(&idtr);
 }
 
+static void setup_tss(){
+	// setup fake tss for esp0 switching
+	gdt[5].limitlow = 0x67;
+	gdt[5].baselow = ((unsigned int)(&general_tss))&0xffff;
+	gdt[5].basemid = (((unsigned int)(&general_tss))>>16)&0xff;
+	gdt[5].type = 0x9;
+	gdt[5].sysflag = 0;
+	gdt[5].dpl = 0;
+	gdt[5].present = 1;
+	gdt[5].limithigh = 0;
+	gdt[5].magic = 0;
+	gdt[5].basehigh = (((unsigned int)(&general_tss))>>24)&0xff;
+	ltr(5<<3);
+}
+
 void register_intr(unsigned char num, void* ISR,unsigned short segment , unsigned char dpl){
 	idt[num].addrlow = (unsigned short)((unsigned int)ISR&0xffff);
 	idt[num].segment = segment;
@@ -66,6 +84,7 @@ void register_trap(unsigned char num, void* ISR,unsigned short segment , unsigne
 
 void arch_init(){
 	setup_gdt();
+	setup_tss();
 	setup_idt();
 	set_int_gate(0, &divide_error);
 	set_int_gate(1, &debug);

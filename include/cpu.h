@@ -1,6 +1,8 @@
 #ifndef CPU_H
 #define CPU_H
 
+typedef unsigned int reg;
+
 // 80686 cpu internal data structure
 // pae PSE PG PE nx MMX xmm sse
 
@@ -42,7 +44,7 @@ struct segment_desc{ // in gdt and ldt
 	unsigned char present : 1;
 	unsigned char limithigh : 4;
 	unsigned char magic : 4;
-	unsigned char basehigh : 4;
+	unsigned char basehigh : 8;
 }__attribute__((packed));
 
 struct gate_desc{ // in idt and tr
@@ -56,7 +58,38 @@ struct gate_desc{ // in idt and tr
 	unsigned short addrhigh;
 }__attribute__((packed));
 
+struct tss{
+	reg lnk;
+	reg esp0;
+	reg ss0;
+	reg esp1;
+	reg ss1;
+	reg esp2;
+	reg ss2;
+	reg eip;
+	reg eflags;
+	reg eax;
+	reg ecx;
+	reg edx;
+	reg ebx;
+	reg esp;
+	reg ebp;
+	reg esi;
+	reg edi;
+	reg es;
+	reg cs;
+	reg ss;
+	reg ds;
+	reg fs;
+	reg gs;
+	reg ldtr;
+	unsigned short padding;
+	unsigned short iopb;
+	reg ssp;
+}__attribute__((packed));
+
 extern void intr_stub();
+extern struct tss general_tss;
 
 void arch_init();
 void register_intr(unsigned char num, void* ISR,unsigned short segment , unsigned char dpl);

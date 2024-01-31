@@ -41,6 +41,10 @@ static inline void lidt(void* idt){
 	__asm__ volatile ("lidt (%0)"::"r"(idt));
 }
 
+static inline void ltr(unsigned int tr){ // tr is 16-bit
+    __asm__ volatile ("ltr %%ax"::"a"(tr));
+}
+
 static inline void flush_segment(unsigned int cs, unsigned int ds){
 	__asm__ volatile (
          "\n"

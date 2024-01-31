@@ -70,7 +70,6 @@ err_code:
 
 hw_int:
 	# handle hw intr
-	xchgw %bx, %bx
 	cli
 	xchgl %eax, (%esp)
 	pushl %ebx
