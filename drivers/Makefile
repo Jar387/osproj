@@ -1,8 +1,9 @@
 OBJS = char/char.o
 INCDIR = ../include
 
+.PHONY: drivers.o
 drivers.o:
-	make -C char
+	(cd char; make)
 	$(MERGE) -r $(OBJS) -o $@
 
 include ../Makefile.in

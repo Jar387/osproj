@@ -16,6 +16,7 @@
 .long CHECKSUM
 
 .section .bss, "aw", @nobits
+.global stack_bottom
 stack_bottom:
 .skip 4096
 stack_top:

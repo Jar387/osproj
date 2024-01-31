@@ -1,6 +1,11 @@
 #include <asm/ring0.h>
+#include <multiboot.h>
+#include <drivers/char.h>
+#include <drivers/char/vga_console.h>
+#include <printk.h>
+#include <stddef.h>
 
-#define VRAM 0xc00b8000
+static int VRAM;
 
 static int x = 0;
 static int y = 0;
@@ -63,11 +68,7 @@ static void cls(){
 	}
 }
 
-int vga_text_readc(char* c){
-	return -1;
-}
-
-int vga_text_writec(char c){
+static int putchar(char c){
 	switch(c){
 	case '\a':
 		// TODO: PC speaker
@@ -100,7 +101,7 @@ int vga_text_writec(char c){
 		return 0;
 	case '\t':
 		for(int i=0;i<4;i++){
-			vga_text_writec('\0');
+			putchar('\0');
 		}
 		return 0;
 	case '\v':
@@ -119,17 +120,32 @@ int vga_text_writec(char c){
 	}
 	int pos = y*80+x;
 	pos*=2;
-	char* vram = (char*)VRAM; // TODO: replace with phy2virt
+	char* vram = (char*)VRAM;
 	vram[pos] = c;
 	step_cursor();
 }
 
-int vga_text_read(char* buf, int count){
-	return -1;
+int vga_console_write(char* buf, int count){
+	for(int i=0;i<count;i++){
+		putchar(buf[i]);
+	}
 }
 
-int vga_text_write(char* buf, int count){
-	for(int i=0;i<count;i++){
-		vga_text_writec(buf[i]);
+static int vga_console_ioctl(long cmd){
+	switch(cmd){
+		case VGA_CONSOLE_IOCMD_CLS:
+			cls();
+		default:
+			return -1;
+	}
+}
+
+void vga_console_init(struct multiboot_info* info, cdev_t* stdout){
+	VRAM = info->framebuffer_addr+0xc0000000;
+	stdout->read = NULL;
+	stdout->write = &vga_console_write;
+	stdout->ioctl = &vga_console_ioctl;
+	if(info->framebuffer_type!=MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT){
+		printk("VGA card is in graphic mode! will use serial console at COM1\n");
 	}
 }

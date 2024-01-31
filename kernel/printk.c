@@ -1,7 +1,10 @@
 #include <drivers/char.h>
 #include <stdarg.h>
+#include <asm/ring0.h>
 
-#define putchar(c) cwritec(CDEV_VGA, c)
+static inline void putchar(char c){
+	cwrite(CDEV_STDOUT, &c, 1);
+}
 
 static inline void puthex(unsigned char hex){
 	if(hex>0xf){
@@ -22,6 +25,10 @@ static void printhex(int val){
 }
 
 static void printint(int val){
+	if(val==0){
+		putchar('0');
+		return;
+	}
 	int power = 10;
 	int i = 0;
 	char buf[10];
