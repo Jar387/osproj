@@ -12,8 +12,8 @@ void init_8259(){
 	outb_p(PIC1_DATA, ICW4_8086); 
 	outb_p(PIC2_DATA, ICW4_8086);
 	// disable all interrupts	
-	outb(PIC1_DATA, 0);
-	outb(PIC2_DATA, 0);
+	outb(PIC1_DATA, 0xfb);
+	outb(PIC2_DATA, 0xff);
 }
 
 void eoi_8259(unsigned char irq){
@@ -33,7 +33,8 @@ void enable_irq(unsigned char irq){
         port = PIC2_DATA;
         irq -= 8;
     }
-    value = inb(port)|(1<<irq);
+    value = inb(port)&~(1<<irq);
+    printk("%x\n", value);
     outb(port, value); 
 }
 
@@ -47,6 +48,6 @@ void disable_irq(unsigned char irq){
         port = PIC2_DATA;
         irq -= 8;
     }
-    value = inb(port)&~(1<<irq);
+    value = inb(port)|(1<<irq);
     outb(port, value); 
 }
