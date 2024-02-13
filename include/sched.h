@@ -33,7 +33,7 @@ struct sched_stack{
 	reg ds;
 	reg es;
 	reg fs;
-}
+};
 
 void do_sched(void* stack_frame);
 void schedule();

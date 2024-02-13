@@ -69,7 +69,6 @@ err_code:
 	iret
 
 hw_int:
-	xchgw %bx, %bx
 	# handle hw intr
 	cli
 	xchgl %eax, (%esp)

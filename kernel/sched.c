@@ -9,7 +9,7 @@ static struct task_struct init_task = {
 	.pid = 1,
 	.status = RUNNING,
 	.next = NULL,
-	.kernel_stack = stack_bottom
+	.kernel_stack = NULL
 };
 
 static unsigned int need_sched;

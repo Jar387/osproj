@@ -34,7 +34,6 @@ void enable_irq(unsigned char irq){
         irq -= 8;
     }
     value = inb(port)&~(1<<irq);
-    printk("%x\n", value);
     outb(port, value); 
 }
 
