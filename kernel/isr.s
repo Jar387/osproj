@@ -2,7 +2,7 @@ no_err_code:
 	# handle cpu exception with no error code
 	# we are in ring0 stack
 	cli
-	xchgl %ebx, (%esp)
+	xchgl %eax, (%esp)
 	pushl %ebx
 	pushl %ecx
 	pushl %edx
@@ -106,10 +106,19 @@ hw_int:
 .global divide_error, debug, nmi, int3, overflow, bounds
 .global opcode, device_not_present, double_fault, i387_overrun, illegal_tss, illegal_segment
 .global stack_overflow, general_protect, page_fault, reserved
-.global pit_int
+.global pit_int, ata_prim_int, ata_scnd_int
 
 pit_int:
 	pushl $do_pit_int
+	jmp hw_int
+
+ata_prim_int:
+	xchgw %bx, %bx
+	pushl $do_ata_int
+	jmp hw_int
+
+ata_scnd_int:
+	pushl $do_ata_int
 	jmp hw_int
 
 divide_error:
@@ -173,5 +182,6 @@ page_fault:
 	jmp err_code
 
 reserved:
+	xchgw %bx, %bx
 	pushl $do_reserved
 	jmp no_err_code
