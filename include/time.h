@@ -2,6 +2,8 @@
 #define TIME_H
 
 // pit chip
+#define PIT_IRQ 0
+
 #define PIT_DATA0 0x40
 #define PIT_DATA1 0x41
 #define PIT_DATA2 0x42

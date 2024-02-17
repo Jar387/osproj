@@ -9,8 +9,10 @@ static struct task_struct init_task = {
 	.pid = 1,
 	.status = RUNNING,
 	.next = NULL,
-	.kernel_stack = stack_bottom
+	.kernel_stack = NULL
 };
+
+static unsigned int need_sched;
 
 static struct task_struct* task_list = &init_task;
 static struct task_struct* tail = &init_task;
@@ -27,4 +29,12 @@ struct task_struct* dup_task_struct(){
 	next_pid++;
 	task->status = RUNNABLE;
 	task->kernel_stack = palloc(ZONE_KERNEL, 1);
+}
+
+void do_sched(void* stack_frame){
+	
+}
+
+void schedule(){
+	need_sched = 1;
 }
