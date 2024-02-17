@@ -113,7 +113,6 @@ pit_int:
 	jmp hw_int
 
 ata_prim_int:
-	xchgw %bx, %bx
 	pushl $do_ata_int
 	jmp hw_int
 

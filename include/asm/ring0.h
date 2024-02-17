@@ -25,7 +25,7 @@ static inline unsigned short inw(unsigned short port){
 }
 
 static inline void outw(unsigned short port, unsigned short data){
-    __asm__ volatile ("outw %%al, %%dx"::"a"(data), "d"(port));
+    __asm__ volatile ("outw %%ax, %%dx"::"a"(data), "d"(port));
 }
 
 static inline void outw_p(unsigned short port, unsigned short data){

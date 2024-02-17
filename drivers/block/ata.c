@@ -2,6 +2,7 @@
 #include <asm/ring0.h>
 #include <printk.h>
 #include <cpu.h>
+#include <pic.h>
 
 static char sect_buffer[512];
 
@@ -45,8 +46,8 @@ static void identify_ata(unsigned short port, unsigned char dev){
 void ata_init(){
 	set_irq_gate(0x56, &ata_prim_int);
 	set_irq_gate(0x57, &ata_scnd_int);
-	reset_ata(PRIM_CHNN_BASE);
-	reset_ata(SCND_CHNN_BASE);
+	reset_ata(PRIM_CHNN_CTRL);
+	reset_ata(SCND_CHNN_CTRL);
 	identify_ata(PRIM_CHNN_BASE, ATA_MASTER_DRV);
 	identify_ata(PRIM_CHNN_BASE, ATA_SLAVE_DRV);
 	identify_ata(SCND_CHNN_BASE, ATA_MASTER_DRV);
@@ -57,13 +58,16 @@ void ata_init(){
 
 void do_ata_int(){
 	printk("ata int!\n");
+	printk("%x %x %x %x %x status\n", (unsigned int)inb(0x1f1),(unsigned int)inb(0x1f2),(unsigned int)inb(0x1f3),(unsigned int)inb(0x1f4),(unsigned int)inb(0x1f5));
+	printk("%x status\n", (unsigned int)inw(0x1f0));
+	printk("%x %x status\n", (unsigned int)inb(0x1f6), (unsigned int)inb(0x1f7));
 	eoi_8259(14);
 }
 
 void ata_test(){
 	lock_kernel();
 	outb_p(0x1f2, 1);
-	outb_p(0x1f3, 1);
+	outb_p(0x1f3, 2);
 	outb_p(0x1f4, 0);
 	outb_p(0x1f5, 0);
 	outb_p(0x1f6, 0x40);
