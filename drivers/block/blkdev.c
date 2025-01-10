@@ -12,7 +12,7 @@ static bdev_t* root_part;
 static bdev_t* last;
 
 void blkdev_load(){
-	ata_init();
+	// ata_init();
 }
 
 int creat_bdev(int dev_num, int(*read)(char*, int), int(*write)(char*, int), int(*ioctl)(long), int(*seek)(long, int)){

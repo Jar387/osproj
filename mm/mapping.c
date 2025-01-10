@@ -10,7 +10,7 @@ int map_page(pde_t* pdbr, void* phy, void* virt, unsigned char perm, unsigned ch
 	pde_t* pde = &pdbr[pde_index];
 	pte_t* pte_base;
 	pte_t* pte;
-	if(pde->PSE==1){
+	if(pde->pse==1){
 		// already mapped 4MB page
 		return -1;
 	}
@@ -25,7 +25,7 @@ int map_page(pde_t* pdbr, void* phy, void* virt, unsigned char perm, unsigned ch
 		pde->pcd = 0;
 		pde->accessed = 0;
 		pde->dirty = 0;
-		pde->PSE = 0;
+		pde->pse = 0;
 		pde->avl = 0;
 		pde->addr = (((unsigned int)pte_base-KERNEL_BASE)>>12);
 	}else{
@@ -65,7 +65,7 @@ int map_huge_page(huge_pde_t* pdbr, void* phy, void* virt, unsigned char perm, u
 	pde->pcd = 0;
 	pde->accessed = 0;
 	pde->dirty = 0;
-	pde->PSE = 1;
+	pde->pse = 1;
 	pde->avl = 0;
 	pde->reserved = 0;
 	pde->addr = (unsigned int)phy>>22;
@@ -77,7 +77,7 @@ void unmap_page(pde_t* pdbr, void* virt){
 	pde_t* pde = &pdbr[pde_index];
 	pte_t* pte_base;
 	pte_t* pte;
-	if(pde->PSE==1){
+	if(pde->pse==1){
 		// unmap 4MB page
 		pde->present = 0;
 		return;

@@ -17,7 +17,6 @@ void kmain(struct multiboot_info* info){
 	pit_init();
 	printk("hardware setup done\n");
 	unlock_kernel();
-	ata_test();
 	for(;;){
 		hlt();
 	}
