@@ -79,12 +79,9 @@ static inline void hlt(){
 	__asm__ volatile ("hlt");
 }
 
-static inline void lock_kernel(){
-	__asm__ volatile ("cli");
-}
+#define lock_kernel() __asm__ volatile ("cli");
 
-static inline void unlock_kernel(){
-	__asm__ volatile ("sti");
-}
+
+#define unlock_kernel() __asm__ volatile ("sti");
 
 #endif

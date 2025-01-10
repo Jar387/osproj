@@ -16,5 +16,6 @@ void insert_next(struct list_node* this, struct list_node* insertee);
 void delete_this(struct list_node* deletee, void (*callback)(void *));
 void decompose_list(struct list_node* head, void (*callback)(void *));
 void list_foreach(struct list_node* head, void (*callback)(void *));
+void list_foreach_reverse(struct list_node* head, void (*callback)(void *));
 
 #endif

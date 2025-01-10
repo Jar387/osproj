@@ -1,4 +1,4 @@
-OBJS = string.o
+OBJS = string.o list.o
 INCDIR = ../include
 
 lib.o: $(OBJS)

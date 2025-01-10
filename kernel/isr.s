@@ -85,7 +85,8 @@ hw_int:
 	movl %cr3, %esi
 	pushl %esi
 
-	pushl %esp
+	movl %esp, %esi
+	pushl %esi
 	movl $2<<3, %edx
 	movw %dx, %ds
 	movw %dx, %es

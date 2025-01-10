@@ -2,6 +2,7 @@
 #define SCHED_H
 
 #include <cpu.h>
+#include <lib/list.h>
 
 #define RUNNABLE 0
 #define RUNNING 1
@@ -23,21 +24,21 @@ struct sched_stack{
 	reg32 ecx;
 	reg32 ebx;
 	reg32 eax;
-	reg32 esp;
-	reg32 ss; // aligned
-	reg32 eflags;
-	reg32 cs; // aligned
 	reg32 eip;
+	reg32 cs;
+	reg32 eflags;
+	reg32 esp;
+	reg32 ss;
 }__attribute__((packed));
 
 struct task_struct{
 	unsigned int pid;
 	unsigned int status;
 	struct sched_stack reg;
-	struct task_struct* next;
+	struct list_node node;
 };
 
-void do_sched(void* stack_frame);
-void schedule();
+void do_sched(struct sched_stack* stack_frame);
+void sched_init();
 
 #endif

@@ -5,6 +5,7 @@
 #include <drivers/char.h>
 #include <drivers/block.h>
 #include <mm/mm.h>
+#include <sched.h>
 #include <time.h>
 
 void kmain(struct multiboot_info* info){
@@ -15,6 +16,7 @@ void kmain(struct multiboot_info* info){
 	mm_init(info->mem_upper, info->mem_lower);
 	blkdev_load();
 	pit_init();
+	sched_init();
 	printk("hardware setup done\n");
 	unlock_kernel();
 	for(;;){
