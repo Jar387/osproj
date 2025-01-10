@@ -1,5 +1,5 @@
 #include <stddef.h>
-#include <slab.h>
+#include <mm/slab.h>
 #include <multiboot.h>
 #include <drivers/char/vga_console.h>
 #include <drivers/char.h>

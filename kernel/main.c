@@ -4,7 +4,7 @@
 #include <printk.h>
 #include <drivers/char.h>
 #include <drivers/block.h>
-#include <mm.h>
+#include <mm/mm.h>
 #include <time.h>
 
 void kmain(struct multiboot_info* info){

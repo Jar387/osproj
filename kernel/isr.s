@@ -69,9 +69,9 @@ err_code:
 	iret
 
 hw_int:
-	# handle hw intr
+	# handle hw intr (only for sched)
 	cli
-	xchgl %eax, (%esp)
+	xchgl %eax, (%esp) # push eax into stack and now eax is isr address
 	pushl %ebx
 	pushl %ecx
 	pushl %edx
@@ -81,16 +81,21 @@ hw_int:
 	pushw %ds
 	pushw %es
 	pushw %fs
-	pushl $0
-	lea 44(%esp), %edx
-	pushl %edx
+	pushw %gs
+	movl %cr3, %esi
+	pushl %esi
+
+	pushl %esp
 	movl $2<<3, %edx
 	movw %dx, %ds
 	movw %dx, %es
 	movw %dx, %fs # load kernel segment
 	call *%eax
-	popl %eax # pop out trash
-	popl %eax
+	popl %esi # pop out trash
+
+	popl %esi
+	movl %esi, %cr3
+	popw %gs
 	popw %fs
 	popw %es
 	popw %ds

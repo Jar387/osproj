@@ -2,7 +2,7 @@
 #define SLAB_H
 
 #include <stddef.h>
-#include <buddy.h>
+#include <mm/buddy.h>
 
 #define KMEM_FLAG_COMFORT 1
 #define KMEM_FLAG_STRICT 2

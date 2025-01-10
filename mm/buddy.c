@@ -1,4 +1,4 @@
-#include <buddy.h>
+#include <mm/buddy.h>
 #include <stddef.h>
 
 static page_t* memmap_kernel;

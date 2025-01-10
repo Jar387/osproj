@@ -1,6 +1,6 @@
 #include <stddef.h>
-#include <slab.h>
-#include <buddy.h>
+#include <mm/slab.h>
+#include <mm/buddy.h>
 
 // alloctor struct stub to allocate allocator
 static kmem_cache_t kmem_kmem = {

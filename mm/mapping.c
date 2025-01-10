@@ -1,8 +1,8 @@
-#include <buddy.h>
+#include <mm/buddy.h>
 #include <cpu.h>
 #include <asm/ring0.h>
 #include <printk.h>
-#include <string.h>
+#include <lib/string.h>
 
 int map_page(pde_t* pdbr, void* phy, void* virt, unsigned char perm, unsigned char rw){
 	unsigned int pde_index = (unsigned int)virt>>22;

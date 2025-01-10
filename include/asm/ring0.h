@@ -87,8 +87,4 @@ static inline void unlock_kernel(){
 	__asm__ volatile ("sti");
 }
 
-static inline void bp(){
-	__asm__ volatile ("xchgw %bx, %bx");
-}
-
 #endif
