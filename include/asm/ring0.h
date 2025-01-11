@@ -86,4 +86,6 @@ static inline void hlt(){
 
 #define bp() __asm__ volatile ("xchgw %bx, %bx");
 
+#define nop() __asm__ volatile ("nop");
+
 #endif

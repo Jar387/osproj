@@ -15,9 +15,9 @@ typedef unsigned short reg16;
 extern struct interrupt_stack* esp_swap;
 
 struct interrupt_stack{
-	reg32 eflags;
-	reg32 cs;
 	reg32 eip;
+	reg32 cs;
+	reg32 eflags;
 }__attribute__((packed));
 
 struct sched_stack{
