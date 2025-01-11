@@ -84,4 +84,6 @@ static inline void hlt(){
 
 #define unlock_kernel() __asm__ volatile ("sti");
 
+#define bp() __asm__ volatile ("xchgw %bx, %bx");
+
 #endif

@@ -1,6 +1,6 @@
 #include <drivers/block.h>
 #include <drivers/block/ata.h>
-#include <slab.h>
+#include <mm/slab.h>
 #include <stddef.h>
 
 static bdev_t* head;

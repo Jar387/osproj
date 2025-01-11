@@ -18,7 +18,7 @@ run: kernel.out
 debug: kernel.out
 	cp kernel.out mnt/
 	sync
-	qemu-system-i386 -hda disk.img -no-reboot -no-shutdown -S -s
+	bochs
 
 
 .PHONY: clean

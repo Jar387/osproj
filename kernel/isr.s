@@ -1,7 +1,12 @@
+.section .data
+.global esp_swap
+esp_swap:
+.long 0
+
+.section .text
 no_err_code:
 	# handle cpu exception with no error code
 	# we are in ring0 stack
-	cli
 	xchgl %eax, (%esp)
 	pushl %ebx
 	pushl %ecx
@@ -35,7 +40,6 @@ no_err_code:
 	iret
 
 err_code:
-	cli
 	xchgl %eax,4(%esp)
 	xchgl %ebx,(%esp)
 	pushl %ecx
@@ -70,7 +74,6 @@ err_code:
 
 hw_int:
 	# handle hw intr (only for sched)
-	cli
 	xchgl %eax, (%esp) # push eax into stack and now eax is isr address
 	pushl %ebx
 	pushl %ecx
@@ -115,78 +118,100 @@ hw_int:
 .global pit_int, ata_prim_int, ata_scnd_int
 
 pit_int:
+	cli
+	movl %esp, (esp_swap)
+	movl $stack_bottom, %esp
+	addl $0xfff, %esp
 	pushl $do_pit_int
 	jmp hw_int
 
 ata_prim_int:
+	cli
 	pushl $do_ata_int
 	jmp hw_int
 
 ata_scnd_int:
+	cli
 	pushl $do_ata_int
 	jmp hw_int
 
 divide_error:
+	cli
 	pushl $do_divide_error
 	jmp no_err_code
 
 debug:
+	cli
 	pushl $do_debug
 	jmp no_err_code
 
 nmi:
+	cli
 	pushl $do_nmi
 	jmp no_err_code
 
 int3:
+	cli
 	pushl $do_int3
 	jmp no_err_code
 
 overflow:
+	cli
 	pushl $do_overflow
 	jmp no_err_code
 
 bounds:
+	cli
 	pushl $do_bounds
 	jmp no_err_code
 
 opcode:
+	cli
 	pushl $do_opcode
 	jmp no_err_code
 
 device_not_present:
+	cli
 	pushl $do_device_not_present
 	jmp no_err_code
 
 double_fault:
+	cli
 	pushl $do_double_fault
 	jmp err_code
 
 i387_overrun:
+	cli
 	pushl $do_i387_overrun
 	jmp no_err_code
 
 illegal_tss:
+	cli
 	pushl $do_illegal_tss
 	jmp err_code
 
 illegal_segment:
+	cli
 	pushl $do_illegal_segment
 	jmp err_code
 
 stack_overflow:
+	cli
 	pushl $do_stack_overflow
 	jmp err_code
 
 general_protect:
+	cli
 	pushl $do_general_protect
 	jmp err_code
 
 page_fault:
+	cli
 	pushl $do_page_fault
 	jmp err_code
 
 reserved:
+	cli
 	xchgw %bx, %bx
 	pushl $do_reserved
 	jmp no_err_code
