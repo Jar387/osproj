@@ -10,22 +10,29 @@ void init1(){
 	printk_s("init1\n");
 	int idx = 0;
 	for(;;){
+		lock_kernel();
 		printk_s("loop1 %i\n", idx);
-		for(int i=0;i<100000000;i++){
-			nop();
-		}
 		idx++;
+		unlock_kernel();
 	}
 }
 
 void init2(){
 	printk_s("init2\n");
+	int idx = 0;
 	for(;;){
-		printk_s("loop2");
+		lock_kernel();
+		printk_s("loop2 %i\n", idx);
+		idx++;
+		unlock_kernel();
 	}
 }
 
 struct task_struct* tss_head;
+
+struct task_struct* tss_2;
+
+unsigned int index = 2;
 
 void* worker_stack_top;
 
@@ -51,6 +58,7 @@ struct task_struct* new_tss(void* entry){
 
 void sched_init(){
 	tss_head = new_tss(&init1);
+	tss_2 = new_tss(&init2);
 	worker_stack_top = palloc(ZONE_KERNEL, 1)+0xfff;
 }
 
@@ -71,14 +79,29 @@ void switch_to_new(struct sched_stack* stack_frame, struct task_struct* tss){
 	struct interrupt_stack* new_kernel_stack = (struct interrupt_stack*)(((char*)(tss->kernel_stack))-sizeof(tss->int_stack));
 	memcpy(new_kernel_stack, &(tss->int_stack), sizeof(*new_kernel_stack));
 	esp_swap = new_kernel_stack;
+	tss->kernel_stack = new_kernel_stack;
 }
 
 void do_sched(struct sched_stack* stack_frame){
-	if(tss_head->status==NEW){
-		tss_head->status = RUNNING;
-		switch_to_new(stack_frame, tss_head);
+	struct task_struct* from;
+	struct task_struct* to;
+	if(index==1){
+		from = tss_head;
+		to = tss_2;
+		index = 2;
 	}else{
-		save_to(stack_frame, tss_head);
-		switch_to(stack_frame, tss_head);
+		from = tss_2;
+		to = tss_head;
+		index = 1;
+	}
+	if(to->status==NEW){
+		to->status = RUNNING;
+		if(from->status==RUNNING){
+			save_to(stack_frame, from);
+		}
+		switch_to_new(stack_frame, to);
+	}else{
+		save_to(stack_frame, from);
+		switch_to(stack_frame, to);
 	}
 }
