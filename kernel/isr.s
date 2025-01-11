@@ -72,9 +72,10 @@ err_code:
 	popl %eax
 	iret
 
-hw_int:
+sched_int:
 	# handle hw intr (only for sched)
-	xchgl %eax, (%esp) # push eax into stack and now eax is isr address
+	# esp @ kernel stack top
+	pushl %eax
 	pushl %ebx
 	pushl %ecx
 	pushl %edx
@@ -85,6 +86,8 @@ hw_int:
 	pushw %es
 	pushw %fs
 	pushw %gs
+	pushw %ss
+	pushw $0
 	movl %cr3, %esi
 	pushl %esi
 
@@ -94,11 +97,17 @@ hw_int:
 	movw %dx, %ds
 	movw %dx, %es
 	movw %dx, %fs # load kernel segment
+	movl $do_pit_int, %eax
 	call *%eax
-	popl %esi # pop out trash
 
-	popl %esi
+	addl $4, %esp # stack balance
+
+	popl %esi # cr3
 	movl %esi, %cr3
+
+	popw %si
+
+	popw %ss
 	popw %gs
 	popw %fs
 	popw %es
@@ -110,7 +119,10 @@ hw_int:
 	popl %ecx
 	popl %ebx
 	popl %eax
+
+	movl (esp_swap), %esp
 	iret
+
 
 .global divide_error, debug, nmi, int3, overflow, bounds
 .global opcode, device_not_present, double_fault, i387_overrun, illegal_tss, illegal_segment
@@ -119,21 +131,20 @@ hw_int:
 
 pit_int:
 	cli
+	xchgw %bx, %bx
 	movl %esp, (esp_swap)
-	movl $stack_bottom, %esp
-	addl $0xfff, %esp
-	pushl $do_pit_int
-	jmp hw_int
+	movl (worker_stack_top), %esp # switch to scheduler working stack
+	jmp sched_int
 
 ata_prim_int:
 	cli
 	pushl $do_ata_int
-	jmp hw_int
+	hlt
 
 ata_scnd_int:
 	cli
 	pushl $do_ata_int
-	jmp hw_int
+	hlt
 
 divide_error:
 	cli

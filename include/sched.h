@@ -7,12 +7,23 @@
 #define RUNNABLE 0
 #define RUNNING 1
 #define BLOCKED 2
+#define NEW 3
 
 typedef unsigned int reg32;
 typedef unsigned short reg16;
 
+extern struct interrupt_stack* esp_swap;
+
+struct interrupt_stack{
+	reg32 eflags;
+	reg32 cs;
+	reg32 eip;
+}__attribute__((packed));
+
 struct sched_stack{
 	reg32 cr3;
+	reg16 padding;
+	reg16 ss;
 	reg16 gs;
 	reg16 fs;
 	reg16 es;
@@ -24,17 +35,14 @@ struct sched_stack{
 	reg32 ecx;
 	reg32 ebx;
 	reg32 eax;
-	reg32 eip;
-	reg32 cs;
-	reg32 eflags;
-	reg32 esp;
-	reg32 ss;
 }__attribute__((packed));
 
 struct task_struct{
 	unsigned int pid;
 	unsigned int status;
-	struct sched_stack reg;
+	void* kernel_stack;
+	struct interrupt_stack int_stack;
+	struct sched_stack generic_stack;
 	struct list_node node;
 };
 
