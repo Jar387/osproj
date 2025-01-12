@@ -131,7 +131,6 @@ sched_int:
 
 pit_int:
 	cli
-	xchgw %bx, %bx
 	movl %esp, (esp_swap)
 	movl (worker_stack_top), %esp # switch to scheduler working stack
 	jmp sched_int

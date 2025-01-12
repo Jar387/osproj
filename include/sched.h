@@ -8,6 +8,9 @@
 #define RUNNING 1
 #define BLOCKED 2
 #define NEW 3
+#define YIELD 4
+
+#define DEFAULT_TIMESLICE 10
 
 typedef unsigned int reg32;
 typedef unsigned short reg16;
@@ -41,9 +44,10 @@ struct task_struct{
 	unsigned int pid;
 	unsigned int status;
 	void* kernel_stack;
+	unsigned int time_slice;
 	struct interrupt_stack int_stack;
 	struct sched_stack generic_stack;
-	struct list_node node;
+	struct task_struct* next;
 };
 
 void do_sched(struct sched_stack* stack_frame);

@@ -5,34 +5,38 @@
 #include <printk.h>
 #include <lib/string.h>
 #include <asm/ring0.h>
+#include <panic.h>
 
 void init1(){
-	printk_s("init1\n");
+	printk("init1\n");
 	int idx = 0;
 	for(;;){
 		lock_kernel();
-		printk_s("loop1 %i\n", idx);
+		//printk("loop1 %i\n", idx);
+		for(int i=0;i<1000000;i++){
+			nop();
+		}
 		idx++;
 		unlock_kernel();
 	}
 }
 
 void init2(){
-	printk_s("init2\n");
+	printk("init2\n");
 	int idx = 0;
 	for(;;){
 		lock_kernel();
-		printk_s("loop2 %i\n", idx);
+		//printk("loop2 %i\n", idx);
+		for(int i=0;i<1000000;i++){
+			nop();
+		}
 		idx++;
 		unlock_kernel();
 	}
 }
 
-struct task_struct* tss_head;
-
-struct task_struct* tss_2;
-
-unsigned int index = 2;
+struct task_struct* tss_head = NULL;
+struct task_struct* curr = NULL;
 
 void* worker_stack_top;
 
@@ -54,11 +58,21 @@ struct task_struct* new_tss(void* entry){
 	new->generic_stack.fs = 2<<3;
 	new->generic_stack.gs = 2<<3;
 	new->generic_stack.ss = 2<<3;
+	new->time_slice = DEFAULT_TIMESLICE;
+	// insert to list
+	if(tss_head==NULL){
+		tss_head = new;
+		new->next = NULL;
+	}else{
+		new->next = tss_head->next;
+		tss_head->next = new;
+	}
+	return new;
 }
 
 void sched_init(){
-	tss_head = new_tss(&init1);
-	tss_2 = new_tss(&init2);
+	new_tss(&init1);
+	new_tss(&init2);
 	worker_stack_top = palloc(ZONE_KERNEL, 1)+0xfff;
 }
 
@@ -82,26 +96,57 @@ void switch_to_new(struct sched_stack* stack_frame, struct task_struct* tss){
 	tss->kernel_stack = new_kernel_stack;
 }
 
+void find_target_tss(struct task_struct** from, struct task_struct** to){
+	struct task_struct* index = tss_head;
+	if(tss_head==NULL){ // init should always be alive
+		panic("init(pid=1) died");
+	}
+	if(curr==NULL){ // handle initial state
+		curr = tss_head;
+		*from = NULL;
+		*to = tss_head;
+		return;
+	}
+	curr->time_slice--;
+	if(curr->time_slice==0){
+		// need schedule
+		bp();
+		curr->time_slice = DEFAULT_TIMESLICE;
+		curr->status = RUNNABLE;
+		*from = curr;
+		curr = curr->next;
+		if(curr==NULL){
+			curr = tss_head;
+			while(curr!=NULL){
+				curr->status = RUNNABLE;
+				curr->time_slice = DEFAULT_TIMESLICE;
+				curr = curr->next;
+			}
+			curr = tss_head;
+		}
+		*to = curr;
+		// don't set status here, maybe new
+	}else{
+		*from = NULL;
+		*to = NULL;
+	}
+}
+
 void do_sched(struct sched_stack* stack_frame){
+	printk("%x\n", stack_frame->cr3);
 	struct task_struct* from;
 	struct task_struct* to;
-	if(index==1){
-		from = tss_head;
-		to = tss_2;
-		index = 2;
-	}else{
-		from = tss_2;
-		to = tss_head;
-		index = 1;
+	find_target_tss(&from, &to);
+	if(from==NULL&&to==NULL){
+		return;
 	}
-	if(to->status==NEW){
-		to->status = RUNNING;
-		if(from->status==RUNNING){
-			save_to(stack_frame, from);
-		}
+	if(from!=NULL){
+		save_to(stack_frame, from);
+	}
+	if(to->status = NEW){
 		switch_to_new(stack_frame, to);
 	}else{
-		save_to(stack_frame, from);
 		switch_to(stack_frame, to);
 	}
+	to->status = RUNNING;
 }
