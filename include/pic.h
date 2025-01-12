@@ -13,7 +13,7 @@
 #define ICW1_INTERVAL4 0x04
 #define ICW1_LEVEL 0x08
 #define ICW1_INIT 0x10
- 
+
 #define ICW4_8086 0x01
 #define ICW4_AUTO 0x02
 #define ICW4_BUF_SLAVE 0x08

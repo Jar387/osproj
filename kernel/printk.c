@@ -2,64 +2,74 @@
 #include <stdarg.h>
 #include <asm/ring0.h>
 
-static inline void putchar(char c){
+static inline void
+putchar(char c)
+{
 	cwrite(CDEV_STDOUT, &c, 1);
 }
 
-static inline void puthex(unsigned char hex){
-	if(hex>0xf){
+static inline void
+puthex(unsigned char hex)
+{
+	if (hex > 0xf) {
 		return;
 	}
-	if(hex<0xa){
-		putchar(hex+'0');
-	}else{
-		putchar(hex-0xa+'A');
+	if (hex < 0xa) {
+		putchar(hex + '0');
+	} else {
+		putchar(hex - 0xa + 'A');
 	}
 }
 
-static void printhex(int val){
-	for(int i=0;i<8;i++){
-		puthex((val&0xf0000000)>>28);
-		val<<=4;
+static void
+printhex(int val)
+{
+	for (int i = 0; i < 8; i++) {
+		puthex((val & 0xf0000000) >> 28);
+		val <<= 4;
 	}
 }
 
-static void printint(int val){
-	if(val==0){
+static void
+printint(int val)
+{
+	if (val == 0) {
 		putchar('0');
 		return;
 	}
 	int power = 10;
 	int i = 0;
 	char buf[10];
-	while(val!=0){
-		char c = (char)(val%10)+'0';
+	while (val != 0) {
+		char c = (char) (val % 10) + '0';
 		buf[i] = c;
-		val/=10;
+		val /= 10;
 		i++;
 	}
 	i--;
-	for(;i>=0;i--){
+	for (; i >= 0; i--) {
 		putchar(buf[i]);
 	}
 }
 
-void printk(const char* fmt, ...){
+void
+printk(const char *fmt, ...)
+{
 	va_list varlist;
 	va_start(varlist, fmt);
 
 	char c = *fmt;
-	while(c!='\0'){
-		if(c=='%'){
+	while (c != '\0') {
+		if (c == '%') {
 			// start fmt
 			fmt++;
 			c = *fmt;
-			switch(c){
+			switch (c) {
 			case 'x':
 				printhex(va_arg(varlist, int));
 				goto fin;
 			case 's':
-				printk(va_arg(varlist, char*));
+				printk(va_arg(varlist, char *));
 				goto fin;
 			case 'i':
 				printint(va_arg(varlist, int));
@@ -67,29 +77,31 @@ void printk(const char* fmt, ...){
 			}
 		}
 		putchar(c);
-		fin:
+	      fin:
 		fmt++;
 		c = *fmt;
 	}
 }
 
-void printk_s(const char* fmt, ...){
+void
+printk_s(const char *fmt, ...)
+{
 	lock_kernel();
 	va_list varlist;
 	va_start(varlist, fmt);
 
 	char c = *fmt;
-	while(c!='\0'){
-		if(c=='%'){
+	while (c != '\0') {
+		if (c == '%') {
 			// start fmt
 			fmt++;
 			c = *fmt;
-			switch(c){
+			switch (c) {
 			case 'x':
 				printhex(va_arg(varlist, int));
 				goto fin;
 			case 's':
-				printk(va_arg(varlist, char*));
+				printk(va_arg(varlist, char *));
 				goto fin;
 			case 'i':
 				printint(va_arg(varlist, int));
@@ -97,7 +109,7 @@ void printk_s(const char* fmt, ...){
 			}
 		}
 		putchar(c);
-		fin:
+	      fin:
 		fmt++;
 		c = *fmt;
 	}

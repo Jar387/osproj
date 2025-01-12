@@ -222,6 +222,5 @@ page_fault:
 
 reserved:
 	cli
-	xchgw %bx, %bx
 	pushl $do_reserved
 	jmp no_err_code

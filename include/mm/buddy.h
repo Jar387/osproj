@@ -5,9 +5,9 @@
 
 void page_init(unsigned int);
 
-void* palloc(int zone, unsigned int size); // kernel zone returns mapped address, \
-										      user zone returns a physical address
-void pfree(void* addr, unsigned int size, unsigned int zone);
+void *palloc(int zone, unsigned int size);	// kernel zone returns mapped address, \
+user zone returns a physical address
+    void pfree(void *addr, unsigned int size, unsigned int zone);
 
 #define MEM_FAULT 0
 #define MEM_UNUSED 1
@@ -16,9 +16,9 @@ void pfree(void* addr, unsigned int size, unsigned int zone);
 #define ZONE_KERNEL 1
 #define ZONE_USER 2
 
-typedef struct{
+typedef struct {
 	unsigned char status;
-}__attribute__((packed)) page_t;
+} __attribute__ ((packed)) page_t;
 
 extern unsigned int _kernel_start;
 extern unsigned int _kernel_end;

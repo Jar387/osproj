@@ -4,35 +4,38 @@
 #include <printk.h>
 #include <lib/string.h>
 
-int map_page(pde_t* pdbr, void* phy, void* virt, unsigned char perm, unsigned char rw){
-	unsigned int pde_index = (unsigned int)virt>>22;
-	unsigned int pte_index = ((unsigned int)virt>>12)&0xfff;
-	pde_t* pde = &pdbr[pde_index];
-	pte_t* pte_base;
-	pte_t* pte;
-	if(pde->pse==1){
+int
+map_page(pde_t * pdbr, void *phy, void *virt, unsigned char perm,
+	 unsigned char rw)
+{
+	unsigned int pde_index = (unsigned int) virt >> 22;
+	unsigned int pte_index = ((unsigned int) virt >> 12) & 0xfff;
+	pde_t *pde = &pdbr[pde_index];
+	pte_t *pte_base;
+	pte_t *pte;
+	if (pde->pse == 1) {
 		// already mapped 4MB page
 		return -1;
 	}
-	if(pde->present==0){
+	if (pde->present == 0) {
 		// create page
-		pte_base = palloc(ZONE_KERNEL, 1); // this is page aligned
+		pte_base = palloc(ZONE_KERNEL, 1);	// this is page aligned
 		memset(pte_base, 0, 4096);
 		pde->present = 1;
-		pde->rw = 1; // page dir allow all access
-		pde->us = 1; // limit perm in page table
+		pde->rw = 1;	// page dir allow all access
+		pde->us = 1;	// limit perm in page table
 		pde->pwt = 0;
 		pde->pcd = 0;
 		pde->accessed = 0;
 		pde->dirty = 0;
 		pde->pse = 0;
 		pde->avl = 0;
-		pde->addr = (((unsigned int)pte_base-KERNEL_BASE)>>12);
-	}else{
-		pte_base = (pte_t*)((pde->addr)<<12);
+		pde->addr = (((unsigned int) pte_base - KERNEL_BASE) >> 12);
+	} else {
+		pte_base = (pte_t *) ((pde->addr) << 12);
 	}
 	pte = &pte_base[pte_index];
-	if(pte->present==1){
+	if (pte->present == 1) {
 		// already mapped page
 		// unmmap first
 		return -1;
@@ -47,14 +50,17 @@ int map_page(pde_t* pdbr, void* phy, void* virt, unsigned char perm, unsigned ch
 	pte->reserved = 0;
 	pte->global = 0;
 	pte->avl = 0;
-	pte->addr = ((unsigned int)phy)>>12;
+	pte->addr = ((unsigned int) phy) >> 12;
 	flush_cr3();
 }
 
-int map_huge_page(huge_pde_t* pdbr, void* phy, void* virt, unsigned char perm, unsigned char rw){
-	unsigned int pde_index = (unsigned int)virt>>22;
-	huge_pde_t* pde = &pdbr[pde_index];
-	if(pde->present==1){
+int
+map_huge_page(huge_pde_t * pdbr, void *phy, void *virt, unsigned char perm,
+	      unsigned char rw)
+{
+	unsigned int pde_index = (unsigned int) virt >> 22;
+	huge_pde_t *pde = &pdbr[pde_index];
+	if (pde->present == 1) {
 		// already mapped page(s)
 		return -1;
 	}
@@ -68,30 +74,32 @@ int map_huge_page(huge_pde_t* pdbr, void* phy, void* virt, unsigned char perm, u
 	pde->pse = 1;
 	pde->avl = 0;
 	pde->reserved = 0;
-	pde->addr = (unsigned int)phy>>22;
+	pde->addr = (unsigned int) phy >> 22;
 }
 
-void unmap_page(pde_t* pdbr, void* virt){
-	unsigned int pde_index = (unsigned int)virt>>22;
-	unsigned int pte_index = ((unsigned int)virt>>12)&0xfff;
-	pde_t* pde = &pdbr[pde_index];
-	pte_t* pte_base;
-	pte_t* pte;
-	if(pde->pse==1){
+void
+unmap_page(pde_t * pdbr, void *virt)
+{
+	unsigned int pde_index = (unsigned int) virt >> 22;
+	unsigned int pte_index = ((unsigned int) virt >> 12) & 0xfff;
+	pde_t *pde = &pdbr[pde_index];
+	pte_t *pte_base;
+	pte_t *pte;
+	if (pde->pse == 1) {
 		// unmap 4MB page
 		pde->present = 0;
 		return;
 	}
-	pte_base = (pte_t*)(((pde->addr)<<12)+KERNEL_BASE);
+	pte_base = (pte_t *) (((pde->addr) << 12) + KERNEL_BASE);
 	pte = &pte_base[pte_index];
 	pte->present = 0;
-	for(int i=0;i<1024;i++){
-		if(pte_base[i].present==1){
+	for (int i = 0; i < 1024; i++) {
+		if (pte_base[i].present == 1) {
 			goto no;
 		}
 	}
 	pfree(pte_base, 1, ZONE_KERNEL);
-	pde->present=0;
-	no:
+	pde->present = 0;
+      no:
 	return;
 }

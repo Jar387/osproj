@@ -4,26 +4,29 @@
 #include <cpu.h>
 #include <lib/list.h>
 
-#define RUNNABLE 0
-#define RUNNING 1
-#define BLOCKED 2
-#define NEW 3
-#define YIELD 4
+#define UNUSED 0
+#define RUNNABLE 1
+#define RUNNING 2
+#define BLOCKED 3
+#define NEW 4
+#define YIELD 5
 
 #define DEFAULT_TIMESLICE 10
+
+#define MAX_TASK 256
 
 typedef unsigned int reg32;
 typedef unsigned short reg16;
 
-extern struct interrupt_stack* esp_swap;
+extern struct interrupt_stack *esp_swap;
 
-struct interrupt_stack{
+struct interrupt_stack {
 	reg32 eip;
 	reg32 cs;
 	reg32 eflags;
-}__attribute__((packed));
+} __attribute__ ((packed));
 
-struct sched_stack{
+struct sched_stack {
 	reg32 cr3;
 	reg16 padding;
 	reg16 ss;
@@ -38,19 +41,18 @@ struct sched_stack{
 	reg32 ecx;
 	reg32 ebx;
 	reg32 eax;
-}__attribute__((packed));
+} __attribute__ ((packed));
 
-struct task_struct{
+struct task_struct {
 	unsigned int pid;
-	unsigned int status;
-	void* kernel_stack;
-	unsigned int time_slice;
+	void *kernel_stack;
 	struct interrupt_stack int_stack;
 	struct sched_stack generic_stack;
-	struct task_struct* next;
+	unsigned int status;
 };
 
-void do_sched(struct sched_stack* stack_frame);
+void do_sched(struct sched_stack *stack_frame);
 void sched_init();
+struct task_struct *new_tss(void *entry);
 
 #endif

@@ -8,7 +8,9 @@
 #include <sched.h>
 #include <time.h>
 
-void kmain(struct multiboot_info* info){
+void
+kmain(struct multiboot_info *info)
+{
 	lock_kernel();
 	cdev_preload(info);
 	printk("Setting up hardwares\n");
@@ -19,7 +21,16 @@ void kmain(struct multiboot_info* info){
 	sched_init();
 	printk("hardware setup done\n");
 	unlock_kernel();
-	for(;;){
+	for (;;) {
+		hlt();
+	}
+}
+
+void
+init()
+{
+	printk("running init\n");
+	for (;;) {
 		hlt();
 	}
 }
