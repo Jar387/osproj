@@ -2,6 +2,7 @@
 #include <mm/slab.h>
 #include <multiboot.h>
 #include <drivers/char/vga_console.h>
+#include <drivers/char/pci.h>
 #include <drivers/char.h>
 
 static cdev_t preload_console = {
@@ -31,10 +32,16 @@ cdev_preload(struct multiboot_info *info)
 }
 
 int
-creat_cdev(int dev_num, int (*read)(char *, int), int(*write)(char *, int),
-	   int(*ioctl)(long))
+cdev_load(struct multiboot_info *info)
 {
-	cdev_t *new_dev = kmalloc(sizeof(cdev_t));
+	init_pci();
+}
+
+int
+creat_cdev(int dev_num, int (*read)(char *, int), int (*write)(char *, int),
+	   int (*ioctl)(long))
+{
+	cdev_t *new_dev = kmalloc(sizeof (cdev_t));
 	if (head == NULL) {
 		head = new_dev;
 		tail = head;

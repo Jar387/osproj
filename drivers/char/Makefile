@@ -1,4 +1,4 @@
-OBJS = vga_console.o chardev.o
+OBJS = vga_console.o chardev.o pci.o
 INCDIR = ../../include
 
 char.o: $(OBJS)

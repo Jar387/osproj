@@ -18,10 +18,10 @@ blkdev_load()
 }
 
 int
-creat_bdev(int dev_num, int (*read)(char *, int), int(*write)(char *, int),
-	   int(*ioctl)(long), int(*seek)(long, int))
+creat_bdev(int dev_num, int (*read)(char *, int), int (*write)(char *, int),
+	   int (*ioctl)(long), int (*seek)(long, int))
 {
-	bdev_t *new_dev = kmalloc(sizeof(bdev_t));
+	bdev_t *new_dev = kmalloc(sizeof (bdev_t));
 	if (head == NULL) {
 		head = new_dev;
 		tail = head;

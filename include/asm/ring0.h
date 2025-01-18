@@ -1,106 +1,94 @@
 #ifndef RING0_H
 #define RING0_H
 
-static inline void
-io_wait()
-{
-	__asm__ volatile ("nop; nop\n");
-}
+#define io_wait() \
+    __asm__ volatile ("nop; nop\n")
 
-static inline void
-outb(unsigned short port, unsigned char data)
-{
-	__asm__ volatile ("outb %%al, %%dx"::"a" (data), "d"(port));
-}
+#define outb(port, data) \
+    __asm__ volatile ("outb %%al, %%dx"::"a" (data), "d"(port))
 
-static inline void
-outb_p(unsigned short port, unsigned char data)
-{
-	outb(port, data);
-	io_wait();
-}
+#define outb_p(port, data) \
+    do { \
+        outb(port, data); \
+        io_wait(); \
+    } while (0)
 
-static inline unsigned char
-inb(unsigned short port)
-{
-	unsigned char result;
-	__asm__ volatile ("inb %%dx":"=a" (result):"d"(port));
-}
+#define inb(port) ({ \
+    unsigned char result; \
+    __asm__ volatile ("inb %%dx":"=a" (result):"d"(port)); \
+    result; \
+})
 
-static inline unsigned short
-inw(unsigned short port)
-{
-	unsigned short result;
-	__asm__ volatile ("inw %%dx":"=a" (result):"d"(port));
-}
+#define inw(port) ({ \
+    unsigned short result; \
+    __asm__ volatile ("inw %%dx":"=a" (result):"d"(port)); \
+    result; \
+})
 
-static inline void
-outw(unsigned short port, unsigned short data)
-{
-	__asm__ volatile ("outw %%ax, %%dx"::"a" (data), "d"(port));
-}
+#define outw(port, data) \
+    __asm__ volatile ("outw %%ax, %%dx"::"a" (data), "d"(port))
 
-static inline void
-outw_p(unsigned short port, unsigned short data)
-{
-	outw(port, data);
-	io_wait();
-}
+#define outw_p(port, data) \
+    do { \
+        outw(port, data); \
+        io_wait(); \
+    } while (0)
 
-static inline void
-lgdt(void *gdt)
-{
-	__asm__ volatile ("lgdt (%0)"::"r" (gdt));
-}
+#define inl(port) ({ \
+    unsigned int result; \
+    __asm__ volatile ("inl %%dx":"=a" (result):"d"(port)); \
+    result; \
+})
 
-static inline void
-lidt(void *idt)
-{
-	__asm__ volatile ("lidt (%0)"::"r" (idt));
-}
+#define outl(port, data) \
+    __asm__ volatile ("outl %0, %1" : : "a" (data), "Nd" (port))
 
-static inline void
-ltr(unsigned int tr)
-{				// tr is 16-bit
-	__asm__ volatile ("ltr %%ax"::"a" (tr));
-}
+#define outl_p(port, data) \
+    do { \
+        outl(port, data); \
+        io_wait(); \
+    } while (0)
 
-static inline void
-flush_segment(unsigned int cs, unsigned int ds)
-{
-	__asm__ volatile ("\n"
-			  "pushl %0\n"
-			  "pushl $1f\n"
-			  "lret \n"
-			  "1:\n"
-			  "mov %1, %%eax\n"
-			  "mov %%ax, %%ds\n"
-			  "mov %%ax, %%es\n"
-			  "mov %%ax, %%fs\n"
-			  "mov %%ax, %%gs\n"
-			  "mov %%ax, %%ss\n"::"g" (cs), "g"(ds)
-			  :"eax");
-}
+#define lgdt(gdt) \
+    __asm__ volatile ("lgdt (%0)"::"r" (gdt))
 
-static inline void
-flush_cr3()
-{
-	__asm__ volatile ("\n"
-			  "movl %%cr3, %%eax\n" "movl %%eax, %%cr3\n":::"eax");
-}
+#define lidt(idt) \
+    __asm__ volatile ("lidt (%0)"::"r" (idt))
 
-static inline void
-hlt()
-{
-	__asm__ volatile ("hlt");
-}
+#define ltr(tr) \
+    __asm__ volatile ("ltr %%ax"::"a" (tr))
 
-#define lock_kernel() __asm__ volatile ("cli");
+#define flush_segment(cs, ds) \
+    __asm__ volatile ("\n" \
+                      "pushl %0\n" \
+                      "pushl $1f\n" \
+                      "lret \n" \
+                      "1:\n" \
+                      "mov %1, %%eax\n" \
+                      "mov %%ax, %%ds\n" \
+                      "mov %%ax, %%es\n" \
+                      "mov %%ax, %%fs\n" \
+                      "mov %%ax, %%gs\n" \
+                      "mov %%ax, %%ss\n"::"g" (cs), "g"(ds):"eax")
 
-#define unlock_kernel() __asm__ volatile ("sti");
+#define flush_cr3() \
+    __asm__ volatile ("\n" \
+                      "movl %%cr3, %%eax\n" \
+                      "movl %%eax, %%cr3\n":::"eax")
 
-#define bp() __asm__ volatile ("xchgw %bx, %bx");
+#define hlt() \
+    __asm__ volatile ("hlt")
 
-#define nop() __asm__ volatile ("nop");
+#define lock_kernel() \
+    __asm__ volatile ("cli")
+
+#define unlock_kernel() \
+    __asm__ volatile ("sti")
+
+#define bp() \
+    __asm__ volatile ("xchgw %bx, %bx")
+
+#define nop() \
+    __asm__ volatile ("nop")
 
 #endif

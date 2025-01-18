@@ -56,3 +56,5 @@ dkms.conf
 mnt/
 *.log
 *.img
+
+.vscode/
