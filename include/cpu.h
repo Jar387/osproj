@@ -29,12 +29,12 @@ typedef unsigned int reg;
 #define KERNEL_BASE 0xc0000000
 #define PDT_SIZE 0x1000		// 4KB
 
-struct xdtr {			// '?dtr'(gdtr, idtr, ldtr, tr...)
+typedef struct {		// '?dtr'(gdtr, idtr, ldtr, tr...)
 	unsigned short limit;
 	void *addr;
-} __attribute__ ((packed));
+} __attribute__ ((packed)) xdtr_t;
 
-struct segment_desc {		// in gdt and ldt
+typedef struct {		// in gdt and ldt
 	unsigned short limitlow;
 	unsigned short baselow;
 	unsigned char basemid;
@@ -45,9 +45,9 @@ struct segment_desc {		// in gdt and ldt
 	unsigned char limithigh:4;
 	unsigned char magic:4;
 	unsigned char basehigh:8;
-} __attribute__ ((packed));
+} __attribute__ ((packed)) segment_desc_t;
 
-struct gate_desc {		// in idt and tr
+typedef struct {		// in idt and tr
 	unsigned short addrlow;
 	unsigned short segment;
 	unsigned char reserve0;
@@ -56,7 +56,7 @@ struct gate_desc {		// in idt and tr
 	unsigned char dpl:2;
 	unsigned char present:1;
 	unsigned short addrhigh;
-} __attribute__ ((packed));
+} __attribute__ ((packed)) gate_desc_t;
 
 extern void intr_stub();
 

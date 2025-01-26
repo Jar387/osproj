@@ -7,6 +7,7 @@
 #include <mm/mm.h>
 #include <sched.h>
 #include <time.h>
+#include <fs/vfs.h>
 
 void
 kmain(struct multiboot_info *info)
@@ -17,6 +18,7 @@ kmain(struct multiboot_info *info)
 	arch_init();
 	mm_init(info->mem_upper, info->mem_lower);
 	blkdev_load();
+	fs_init();
 	cdev_load(info);
 	pit_init();
 	sched_init();

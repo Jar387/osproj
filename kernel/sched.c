@@ -8,7 +8,7 @@
 #include <panic.h>
 #include <kernel.h>
 
-static struct task_struct tss_list[MAX_TASK];
+static task_struct_t tss_list[MAX_TASK];
 static unsigned int used_index = 0;
 static unsigned int curr_index = 0;
 
@@ -22,7 +22,7 @@ new_tss(void *entry)
 	if (used_index > MAX_TASK - 1) {
 		panic("tss full");
 	}
-	struct task_struct *new = tss_list + used_index;
+	task_struct_t *new = tss_list + used_index;
 	memset(new, 0, sizeof (*new));
 	new->pid = next_pid;
 	next_pid++;
@@ -45,14 +45,14 @@ void
 sched_init()
 {
 	for (int i = 0; i < MAX_TASK; i++) {
-		memset(tss_list + i, 0, sizeof (struct task_struct));
+		memset(tss_list + i, 0, sizeof (task_struct_t));
 	}
 	new_tss(init);
 	worker_stack_top = palloc(ZONE_KERNEL, 1) + 0xfff;
 }
 
 static void
-save_to(struct sched_stack *stack_frame, struct task_struct *tss)
+save_to(sched_stack_t * stack_frame, task_struct_t * tss)
 {
 	memcpy(&(tss->int_stack), esp_swap, sizeof (*esp_swap));
 	memcpy(&(tss->generic_stack), stack_frame, sizeof (*stack_frame));
@@ -60,7 +60,7 @@ save_to(struct sched_stack *stack_frame, struct task_struct *tss)
 }
 
 static void
-switch_to(struct sched_stack *stack_frame, struct task_struct *tss)
+switch_to(sched_stack_t * stack_frame, task_struct_t * tss)
 {
 	memcpy(esp_swap, &(tss->int_stack), sizeof (*esp_swap));
 	memcpy(stack_frame, &(tss->generic_stack), sizeof (*stack_frame));
@@ -68,10 +68,10 @@ switch_to(struct sched_stack *stack_frame, struct task_struct *tss)
 }
 
 static void
-switch_to_new(struct sched_stack *stack_frame, struct task_struct *tss)
+switch_to_new(sched_stack_t * stack_frame, task_struct_t * tss)
 {
 	memcpy(stack_frame, &(tss->generic_stack), sizeof (*stack_frame));
-	struct interrupt_stack *new_kernel_stack =
+	interrupt_stack_t *new_kernel_stack =
 	    (struct interrupt_stack *) (((char *) (tss->kernel_stack)) -
 					sizeof (tss->int_stack));
 	memcpy(new_kernel_stack, &(tss->int_stack), sizeof (*new_kernel_stack));
@@ -80,7 +80,7 @@ switch_to_new(struct sched_stack *stack_frame, struct task_struct *tss)
 }
 
 void
-do_sched(struct sched_stack *stack_frame)
+do_sched(sched_stack_t * stack_frame)
 {
 	unsigned int last_index = curr_index;
 	curr_index++;

@@ -1,54 +1,45 @@
 #include <lib/list.h>
+#include <printk.h>
+#include <stddef.h>
+#include <mm/slab.h>
 
-void
-init_list(struct list_node *head)
+list_node_t *
+list_insert(list_node_t * head, void *data)
 {
-	head->prev = NULL;
-	head->next = NULL;
-}
-
-void
-insert_next(struct list_node *this, struct list_node *insertee)
-{
-	insertee->prev = this;
-	insertee->next = this->next;
-	this->next->prev = insertee;
-	this->next = insertee;
-}
-
-void
-delete_this(struct list_node *deletee, void (*callback)(void *))
-{
-	deletee->prev->next = deletee->next;
-	deletee->next->prev = deletee->prev;
-	if (callback != NULL) {
-		callback(deletee);
+	list_node_t *node = (list_node_t *) kmalloc(sizeof (*node));
+	node->data = data;
+	if (head == NULL) {
+		// new list
+		node->prev = NULL;
+		node->next = NULL;
+	} else {
+		node->next = head->next;
+		head->next->prev = node;
+		head->next = node;
+		node->prev = head;
 	}
+	return node;
 }
 
 void
-decompose_list(struct list_node *head, void (*callback)(void *))
+list_delete(list_node_t * obj)
 {
-	head->prev->next = NULL;
-	list_foreach(head, callback);
-}
-
-void
-list_foreach(struct list_node *head, void (*callback)(void *))
-{
-	struct list_node *idx = head;
-	while (idx != NULL) {
-		callback(idx);
-		idx = idx->next;
+	if (obj->prev != NULL && obj->next != NULL) {
+		obj->prev->next = obj->next;
+		obj->next->prev = obj->prev;
 	}
+	kfree(obj);
 }
 
 void
-list_foreach_reverse(struct list_node *head, void (*callback)(void *))
+list_iter(list_node_t * head, void (*callback)(list_node_t *))
 {
-	struct list_node *idx = head;
-	while (idx != NULL) {
-		callback(idx);
-		idx = idx->prev;
+	if(head == NULL) {
+		return;
 	}
+	list_node_t *curr = head;
+	do {
+		callback(curr);
+		curr = curr->next;
+	} while (curr != head);
 }

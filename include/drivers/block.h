@@ -1,7 +1,7 @@
 #ifndef DRIVERS_BLOCK_H
 #define DRIVERS_BLOCK_H
 
-typedef struct BDEV {
+typedef struct {
 	int dev_num;
 	int (*read)(char *, int);
 	int (*write)(char *, int);

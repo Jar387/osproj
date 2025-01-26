@@ -1,21 +1,14 @@
 #ifndef LIST_H
 #define LIST_H
 
-#include <stddef.h>
+typedef struct list_node_t {
+	void *data;
+	struct list_node_t *prev;
+	struct list_node_t *next;
+} list_node_t;
 
-#define PARENT_PTR(child_ptr, parent_type, child_member) \
-    ((parent_type *)((char *)(child_ptr) - offsetof(parent_type, child_member)))
-
-struct list_node {
-	struct list_node *prev;
-	struct list_node *next;
-};
-
-void init_list(struct list_node *head);
-void insert_next(struct list_node *this, struct list_node *insertee);
-void delete_this(struct list_node *deletee, void (*callback)(void *));
-void decompose_list(struct list_node *head, void (*callback)(void *));
-void list_foreach(struct list_node *head, void (*callback)(void *));
-void list_foreach_reverse(struct list_node *head, void (*callback)(void *));
+list_node_t *list_insert(list_node_t * head, void *data);
+void list_delete(list_node_t * obj);
+void list_iter(list_node_t * head, void (*callback)(list_node_t *));
 
 #endif

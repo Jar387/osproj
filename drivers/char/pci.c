@@ -6,21 +6,23 @@
 static char *classes[256] =
     { "Unclassified", "Mass Storage Controller", "Network Controller",
 	"Display Controller", "Multimedia Controller", "Memory Controller",
-	    "Bridge",
+	"Bridge",
 	"Simple Communication Controller", "Base System Peripheral",
-	    "Input Device Controller",
+	"Input Device Controller",
 	"Docking Station", "Processor", "Serial Bus Controller",
-	    "Wireless Controller",
+	"Wireless Controller",
 	"Intelligent Controller", "Satellite Communication Controller",
-	    "Encryption Controller",
+	"Encryption Controller",
 	"Signal Processing Controller", "Processing Accelerator",
-	    "Non-Essential Instrumentation"
+	"Non-Essential Instrumentation"
 };
 
 static char *mass_storage[] =
     { "SCSI Bus Controller", "IDE Controller", "Floppy Disk Controller",
-"IPI Bus Controller", "RAID Controller", "ATA Controller", "Serial ATA Controller",
-"Serial Attached SCSI Controller", "Non-Volatile Memory Controller" };
+	"IPI Bus Controller", "RAID Controller", "ATA Controller",
+	"Serial ATA Controller",
+	"Serial Attached SCSI Controller", "Non-Volatile Memory Controller"
+};
 
 static unsigned int
 read_pci_data(unsigned char bus, unsigned char dev, unsigned char func,

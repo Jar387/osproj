@@ -3,16 +3,16 @@
 #include <interrupt.h>
 #include <pic.h>
 
-static struct segment_desc gdt[6];
-static struct xdtr gdtr;
+static segment_desc_t gdt[6];
+static xdtr_t gdtr;
 
-static struct gate_desc idt[256];
-static struct xdtr idtr;
+static gate_desc_t idt[256];
+static xdtr_t idtr;
 
 static void
 setup_gdt()
 {
-	gdtr.limit = 6 * sizeof (struct segment_desc);
+	gdtr.limit = 6 * sizeof (segment_desc_t);
 	gdtr.addr = &gdt;
 	int *ptr = (int *) gdt;
 	*ptr = 0;
@@ -43,7 +43,7 @@ setup_gdt()
 static void
 setup_idt()
 {
-	idtr.limit = 256 * sizeof (struct gate_desc);
+	idtr.limit = 256 * sizeof (gate_desc_t);
 	idtr.addr = &idt;
 	lidt(&idtr);
 }

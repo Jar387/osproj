@@ -18,15 +18,15 @@
 typedef unsigned int reg32;
 typedef unsigned short reg16;
 
-extern struct interrupt_stack *esp_swap;
-
-struct interrupt_stack {
+typedef struct {
 	reg32 eip;
 	reg32 cs;
 	reg32 eflags;
-} __attribute__ ((packed));
+} __attribute__ ((packed)) interrupt_stack_t;
 
-struct sched_stack {
+extern interrupt_stack_t *esp_swap;
+
+typedef struct {
 	reg32 cr3;
 	reg16 padding;
 	reg16 ss;
@@ -41,17 +41,17 @@ struct sched_stack {
 	reg32 ecx;
 	reg32 ebx;
 	reg32 eax;
-} __attribute__ ((packed));
+} __attribute__ ((packed)) sched_stack_t;
 
-struct task_struct {
+typedef struct {
 	unsigned int pid;
 	void *kernel_stack;
-	struct interrupt_stack int_stack;
-	struct sched_stack generic_stack;
+	interrupt_stack_t int_stack;
+	sched_stack_t generic_stack;
 	unsigned int status;
-};
+} task_struct_t;
 
-void do_sched(struct sched_stack *stack_frame);
+void do_sched(sched_stack_t * stack_frame);
 void sched_init();
 struct task_struct *new_tss(void *entry);
 

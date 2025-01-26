@@ -7,7 +7,7 @@
 
 #include <multiboot.h>
 
-typedef struct CDEV {
+typedef struct {
 	int dev_num;
 	int (*read)(char *, int);
 	int (*write)(char *, int);
