@@ -1,13 +1,13 @@
 #ifndef DRIVERS_BLOCK_H
 #define DRIVERS_BLOCK_H
 
-typedef struct {
+typedef struct bdev_t {
 	int dev_num;
 	int (*read)(char *, int);
 	int (*write)(char *, int);
 	int (*ioctl)(long);
 	int (*seek)(long, int);
-	struct BDEV *next;
+	struct bdev_t *next;
 } bdev_t;
 
 void blkdev_load();

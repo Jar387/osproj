@@ -4,5 +4,4 @@
 void
 fs_init()
 {
-	printk("fs\n");
 }

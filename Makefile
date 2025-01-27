@@ -13,7 +13,7 @@ kernel.out: Makefile link.ld Makefile.in
 run: kernel.out
 	cp kernel.out mnt/
 	sync
-	qemu-system-i386 -hda disk.img -no-reboot -no-shutdown
+	qemu-system-i386 -hda disk.img -no-reboot -no-shutdown -cpu host -enable-kvm
 
 .PHONY: debug
 debug: kernel.out
@@ -30,6 +30,8 @@ clean:
 	-make -C drivers subclean
 	-make -C lib subclean
 	-make -C drivers/char subclean
+	-make -C drivers/block subclean
+	-make -C fs subclean
 	-rm serial.log
 	-rm System.map
 

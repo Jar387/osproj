@@ -1,4 +1,4 @@
-OBJS = head.o main.o cpu.o interrupt.o printk.o panic.o isr.o time.o pic.o sched.o
+OBJS = head.o main.o cpu.o interrupt.o printk.o panic.o isr.o time.o apic.o pic.o sched.o
 INCDIR = ../include
 
 kernel.o: $(OBJS)
