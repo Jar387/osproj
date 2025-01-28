@@ -1,10 +1,8 @@
 #ifndef ACPI_H
 #define ACPI_H
 
-#define ACPI_PTR(p) (((char*)p)+0xC0000000)
-
-#define RSDP_LO 0xe0000
-#define RSDP_HI 0xfffff
+#define RSDP_LO (void*)0xe0000
+#define RSDP_HI (void*)0xfffff
 
 typedef struct {
 	char signature[8];
@@ -31,6 +29,16 @@ typedef struct {
 	xsdt_header_t *next_xsdt;
 } __attribute__ ((packed)) rsdt_t;
 
+typedef struct {
+	xsdt_header_t h;
+	unsigned int lapic_addr;
+	unsigned int flags;
+	unsigned char entries[];
+} __attribute__ ((packed)) madt_t;
+
 void acpi_init();
+
+extern void *apic_addr;
+extern void *ioapic_addr;
 
 #endif

@@ -23,7 +23,7 @@ kmain(struct multiboot_info *info)
 	pit_init();
 	sched_init();
 	printk("hardware setup done\n");
-	unlock_kernel();
+	// unlock_kernel();
 	for (;;) {
 		hlt();
 	}

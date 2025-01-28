@@ -4,6 +4,34 @@
 #include <printk.h>
 #include <lib/string.h>
 
+void *
+phy2lin(void *phy)
+{
+	if ((unsigned int) phy <= 0x40000000) {
+		// kernel space
+		return phy + 0xC0000000;
+	}
+	if ((unsigned int) phy >= 0xC0000000) {
+		// mmio
+		return phy - 0x40000000;
+	}
+	return NULL;
+}
+
+void *
+lin2phy(void *lin)
+{
+	if ((unsigned int) lin >= 0xC0000000) {
+		// kernel space
+		return lin - 0xC0000000;
+	}
+	if ((unsigned int) lin >= 0x80000000 && (unsigned int) lin < 0xC0000000) {
+		// mmio
+		return lin + 0x40000000;
+	}
+	return NULL;
+}
+
 int
 map_page(pde_t * pdbr, void *phy, void *virt, unsigned char perm,
 	 unsigned char rw)
@@ -75,6 +103,7 @@ map_huge_page(huge_pde_t * pdbr, void *phy, void *virt, unsigned char perm,
 	pde->avl = 0;
 	pde->reserved = 0;
 	pde->addr = (unsigned int) phy >> 22;
+	flush_cr3();
 }
 
 void

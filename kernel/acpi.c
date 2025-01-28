@@ -3,10 +3,15 @@
 #include <printk.h>
 #include <stddef.h>
 #include <panic.h>
+#include <mm/mmap.h>
 
 static rsdp_t *rsdp;
 
 static rsdt_t *rsdt;
+static madt_t *madt;
+
+void *apic_addr;
+void *ioapic_addr;
 
 static unsigned char
 acpi_checksum(char *head, unsigned int length)
@@ -31,7 +36,7 @@ find_xsdt(char *signature)
 		if (strncmp
 		    ((char *) ((((*p) + 0xC0000000)->signature) + 0xC0000000),
 		     signature, 4) == 0) {
-			return (xsdt_header_t *) ACPI_PTR(*p);
+			return (xsdt_header_t *) phy2lin(*p);
 		}
 		p++;
 	}
@@ -42,8 +47,8 @@ void
 acpi_init()
 {
 	// search for RSDP
-	char *p = (char *) ACPI_PTR(RSDP_LO);
-	while ((unsigned int) p < (unsigned int) ACPI_PTR(RSDP_HI)) {
+	char *p = (char *) phy2lin(RSDP_LO);
+	while ((unsigned int) p < (unsigned int) phy2lin(RSDP_HI)) {
 		if (memcmp(p, "RSD PTR ", 8) == 0) {
 			break;
 		}
@@ -55,11 +60,23 @@ acpi_init()
 		panic("bad rsdp checksum");
 	}
 	if (rsdp->revision != 0) {
-		panic("unsupported apci version");
+		panic("unsupported acpi version");
 	}
-	rsdt = (rsdt_t *) (ACPI_PTR(rsdp->rsdt_address));
+	rsdt = (rsdt_t *) (phy2lin(rsdp->rsdt_address));
 	if (acpi_checksum((char *) rsdt, rsdt->h.length) == 0) {
 		panic("bad rsdt checksum");
 	}
-	printk("%x\n", find_xsdt("APIC"));
+	// find MADT
+	madt = (madt_t *) find_xsdt("APIC");
+	apic_addr = (void *) (madt->lapic_addr);
+	unsigned int i;
+	while (i < ((madt->h.length) - sizeof (xsdt_header_t))) {
+		if ((madt->entries)[i] != 1) {
+			i += (madt->entries)[i + 1];
+		} else {
+			ioapic_addr = *((void **) ((madt->entries) + i + 4));
+			break;
+		}
+	}
+	printk("%x\n", ioapic_addr);
 }

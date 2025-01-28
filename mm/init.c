@@ -1,6 +1,7 @@
 #include <printk.h>
 #include <mm/slab.h>
 #include <mm/buddy.h>
+#include <mm/mmap.h>
 
 void
 mm_init(unsigned int memupper, unsigned int memlower)

@@ -1,11 +1,11 @@
 #include <asm/ring0.h>
 #include <cpu.h>
 #include <interrupt.h>
-#include <pic.h>
 #include <apic.h>
 #include <acpi.h>
 #include <cpuid.h>
 #include <mm/slab.h>
+#include <mm/mmap.h>
 #include <panic.h>
 #include <printk.h>
 
@@ -189,7 +189,12 @@ arch_init()
 	for (int i = 15; i <= 0xff; i++) {
 		set_int_gate(i, &reserved);
 	}
+	for (int i = 0; i < 0x100; i++) {
+		// map mmio
+		map_huge_page((void *) 0xC0000000,
+			      (void *) 0xC0000000 + i * 0x400000,
+			      (void *) 0x80000000 + i * 0x400000, 0, 1);
+	}
 	acpi_init();
 	apic_init();
-	init_8259();
 }

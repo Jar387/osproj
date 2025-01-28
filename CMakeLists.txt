@@ -59,8 +59,7 @@ add_custom_target(umount
 )
 
 add_custom_target(indent
-    COMMAND find . -type f ( -name "*.c" -o -name "*.h" ) -exec indent -kr -i8 -ts8 -sob -l80 -ss -bs -psl -bap {} ;
-    COMMAND find . -type f ( -name "*~" ) -exec rm {} ;
+    COMMAND ${CMAKE_SOURCE_DIR}/indent.sh
 )
 
 add_custom_target(ln

@@ -2,7 +2,6 @@
 #include <asm/ring0.h>
 #include <printk.h>
 #include <cpu.h>
-#include <pic.h>
 
 static char sect_buffer[512];
 
@@ -55,29 +54,17 @@ identify_ata(unsigned short port, unsigned char dev)
 void
 ata_init()
 {
-	set_irq_gate(0x56, &ata_prim_int);
-	set_irq_gate(0x57, &ata_scnd_int);
 	reset_ata(PRIM_CHNN_CTRL);
 	reset_ata(SCND_CHNN_CTRL);
 	identify_ata(PRIM_CHNN_BASE, ATA_MASTER_DRV);
 	identify_ata(PRIM_CHNN_BASE, ATA_SLAVE_DRV);
 	identify_ata(SCND_CHNN_BASE, ATA_MASTER_DRV);
 	identify_ata(SCND_CHNN_BASE, ATA_SLAVE_DRV);
-	enable_irq(PRIM_CHNN_IRQ);
-	enable_irq(SCND_CHNN_IRQ);
 }
 
 void
 do_ata_int()
 {
-	printk("ata int!\n");
-	printk("%x %x %x %x %x status\n", (unsigned int) inb(0x1f1),
-	       (unsigned int) inb(0x1f2), (unsigned int) inb(0x1f3),
-	       (unsigned int) inb(0x1f4), (unsigned int) inb(0x1f5));
-	printk("%x status\n", (unsigned int) inw(0x1f0));
-	printk("%x %x status\n", (unsigned int) inb(0x1f6),
-	       (unsigned int) inb(0x1f7));
-	eoi_8259(14);
 }
 
 void
