@@ -7,6 +7,7 @@
 #include <cpuid.h>
 #include <mm/slab.h>
 #include <panic.h>
+#include <printk.h>
 
 static segment_desc_t gdt[6];
 static xdtr_t gdtr;

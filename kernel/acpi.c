@@ -2,6 +2,7 @@
 #include <lib/string.h>
 #include <printk.h>
 #include <stddef.h>
+#include <panic.h>
 
 static rsdp_t *rsdp;
 
@@ -30,7 +31,7 @@ find_xsdt(char *signature)
 		if (strncmp
 		    ((char *) ((((*p) + 0xC0000000)->signature) + 0xC0000000),
 		     signature, 4) == 0) {
-			return ACPI_PTR(*p);
+			return (xsdt_header_t *) ACPI_PTR(*p);
 		}
 		p++;
 	}
@@ -42,7 +43,7 @@ acpi_init()
 {
 	// search for RSDP
 	char *p = (char *) ACPI_PTR(RSDP_LO);
-	while ((unsigned int) p < ACPI_PTR(RSDP_HI)) {
+	while ((unsigned int) p < (unsigned int) ACPI_PTR(RSDP_HI)) {
 		if (memcmp(p, "RSD PTR ", 8) == 0) {
 			break;
 		}

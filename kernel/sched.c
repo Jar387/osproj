@@ -16,7 +16,7 @@ void *worker_stack_top;
 
 static unsigned int next_pid = 1;
 
-struct task_struct *
+task_struct_t *
 new_tss(void *entry)
 {
 	if (used_index > MAX_TASK - 1) {
@@ -72,8 +72,8 @@ switch_to_new(sched_stack_t * stack_frame, task_struct_t * tss)
 {
 	memcpy(stack_frame, &(tss->generic_stack), sizeof (*stack_frame));
 	interrupt_stack_t *new_kernel_stack =
-	    (struct interrupt_stack *) (((char *) (tss->kernel_stack)) -
-					sizeof (tss->int_stack));
+	    (interrupt_stack_t *) (((char *) (tss->kernel_stack)) -
+				   sizeof (tss->int_stack));
 	memcpy(new_kernel_stack, &(tss->int_stack), sizeof (*new_kernel_stack));
 	esp_swap = new_kernel_stack;
 	tss->kernel_stack = new_kernel_stack;
