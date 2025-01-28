@@ -3,6 +3,7 @@
 #include <interrupt.h>
 #include <pic.h>
 #include <apic.h>
+#include <acpi.h>
 #include <cpuid.h>
 #include <mm/slab.h>
 #include <panic.h>
@@ -17,16 +18,16 @@ static xdtr_t idtr;
 static char *cpuid_feat_c[] =
     { "sse3", "pclmul", "dtes64", "monitor", "ds_cpl", "vmx", "smx", "est",
 	"tm2", "ssse3", "cid", "sdbg", "fma", "cx16", "xtpr", "pdcm", "pcid",
-	    "dca", "sse4_1",
+	"dca", "sse4_1",
 	"sse4_2", "x2apic", "movbe", "popcnt", "tsc", "aes", "xsave", "osxsave",
-	    "avx", "f16c",
+	"avx", "f16c",
 	"rdrand", "hypervisor"
 };
 
 static char *cpuid_feat_d[] =
     { "fpu", "vme", "de", "*pse", "tsc", "*msr", "*pae", "mce", "cx8", "*apic",
 	"sep", "mtrr", "pge", "mca", "cmov", "pat", "pse36", "psn", "clflush",
-	    "ds", "acpi", "mmx",
+	"ds", "acpi", "mmx",
 	"fxsr", "sse", "sse2", "ss", "htt", "tm", "ia64", "pbe"
 };
 
@@ -187,6 +188,7 @@ arch_init()
 	for (int i = 15; i <= 0xff; i++) {
 		set_int_gate(i, &reserved);
 	}
+	acpi_init();
 	apic_init();
 	init_8259();
 }

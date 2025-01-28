@@ -38,10 +38,10 @@ cdev_load(struct multiboot_info *info)
 }
 
 int
-creat_cdev(int dev_num, int (*read)(char *, int), int(*write)(char *, int),
-	   int(*ioctl)(long))
+creat_cdev(int dev_num, int (*read)(char *, int), int (*write)(char *, int),
+	   int (*ioctl)(long))
 {
-	cdev_t *new_dev = kmalloc(sizeof(cdev_t));
+	cdev_t *new_dev = kmalloc(sizeof (cdev_t));
 	if (head == NULL) {
 		head = new_dev;
 		tail = head;
