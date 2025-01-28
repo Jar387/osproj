@@ -58,3 +58,4 @@ mnt/
 *.img
 
 .vscode/
+build/
