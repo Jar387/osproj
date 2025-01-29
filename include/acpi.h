@@ -38,7 +38,7 @@ typedef struct {
 
 void acpi_init();
 
-extern void *apic_addr;
-extern void *ioapic_addr;
+extern void volatile *apic_addr;
+extern void volatile *ioapic_addr;
 
 #endif

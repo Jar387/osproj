@@ -10,8 +10,8 @@ static rsdp_t *rsdp;
 static rsdt_t *rsdt;
 static madt_t *madt;
 
-void *apic_addr;
-void *ioapic_addr;
+void volatile *apic_addr;
+void volatile *ioapic_addr;
 
 static unsigned char
 acpi_checksum(char *head, unsigned int length)
@@ -68,15 +68,14 @@ acpi_init()
 	}
 	// find MADT
 	madt = (madt_t *) find_xsdt("APIC");
-	apic_addr = (void *) (madt->lapic_addr);
+	apic_addr = phy2lin((void *) (madt->lapic_addr));
 	unsigned int i;
 	while (i < ((madt->h.length) - sizeof (xsdt_header_t))) {
 		if ((madt->entries)[i] != 1) {
 			i += (madt->entries)[i + 1];
 		} else {
-			ioapic_addr = *((void **) ((madt->entries) + i + 4));
+			ioapic_addr = phy2lin(*((void **) ((madt->entries) + i + 4)));
 			break;
 		}
 	}
-	printk("%x\n", ioapic_addr);
 }

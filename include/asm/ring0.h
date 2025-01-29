@@ -58,6 +58,12 @@
 #define ltr(tr) \
     __asm__ volatile ("ltr %%ax"::"a" (tr))
 
+#define rdmsr(msr, lo, hi) \
+    __asm__ volatile ("rdmsr" : "=a"(*lo), "=d"(*hi) : "c"(msr))
+
+#define wrmsr(msr, lo, hi) \
+    __asm__ volatile ("wrmsr" : : "a"(lo), "d"(hi), "c"(msr))
+
 #define flush_segment(cs, ds) \
     __asm__ volatile ("\n" \
                       "pushl %0\n" \
