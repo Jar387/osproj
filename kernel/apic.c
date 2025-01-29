@@ -36,16 +36,28 @@ void
 apic_init()
 {
     // disable 8259 pic
-    outb(0x21, 0xff);
-    outb(0xa1, 0xff);
+    outb(PIC_1_DATA, 0xff);
+    outb(PIC_2_DATA, 0xff);
     // hard enable local apic
     unsigned int eax, edx;
     rdmsr(IA32_APIC_BASE_MSR, &eax, &edx);
     eax|=IA32_APIC_BASE_MSR_ENABLE;
     wrmsr(IA32_APIC_BASE_MSR, eax, edx);
-    lapic_write(0xF0, lapic_read(0xF0)|0x100);
-    // timer test
-    lapic_write(0x3E0, 3);
-    lapic_write(0x380, 0x100);
-    lapic_write(0x320, 32 | 0x20000);
+    lapic_write(LAPIC_SPR_INR_VEC, lapic_read(LAPIC_SPR_INR_VEC)|LAPIC_SPR_ENABLE);
+    // init apic timer
+    // figure out length of 1ms
+    lapic_write(LAPIC_TMR_DCR, 0x3);
+    lapic_write(LAPIC_TMR_ICR, 0xffffffff);
+
+    outb_p(0x43, 0x20);
+    outb_p(0x40, 0x2e);
+
+    lapic_write(LAPIC_TMR_ICR, 0xffffffff);
+
+    while(inb(0x40)){
+    }
+    unsigned int offset = 0xffffffff-lapic_read(LAPIC_TMR_CCR);
+    lapic_write(LAPIC_TMR_DCR, 0x3);
+    lapic_write(LAPIC_TMR_ICR, offset);
+    lapic_write(LAPIC_LVR_TMR, 32 | 0x20000);
 }

@@ -64,6 +64,9 @@
 #define wrmsr(msr, lo, hi) \
     __asm__ volatile ("wrmsr" : : "a"(lo), "d"(hi), "c"(msr))
 
+#define rdtsc(lo, hi) \
+    __asm__ volatile ("rdtsc" : "=a"(*lo), "=d"(*hi))
+
 #define flush_segment(cs, ds) \
     __asm__ volatile ("\n" \
                       "pushl %0\n" \

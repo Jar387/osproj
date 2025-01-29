@@ -136,10 +136,7 @@ check_cpu()
 			}
 		}
 	}
-	// check cpu speed
-	unsigned int ferq;
-	__get_cpuid(0x16, &ferq, &unused, &unused, &unused);
-	printk("\ncpu Hz: %i\n", ferq);
+	printk("\n");
 }
 
 void

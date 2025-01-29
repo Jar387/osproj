@@ -2,6 +2,8 @@
 #include <time.h>
 #include <cpu.h>
 #include <sched.h>
+#include <printk.h>
+#include <apic.h>
 
 static unsigned long jeffies = 0;
 
@@ -15,7 +17,6 @@ void
 do_pit_int(void *stack_frame)
 {
     jeffies++;
-    printk("%i\n", jeffies);
 	do_sched(stack_frame);
     eoi_apic();
 }
