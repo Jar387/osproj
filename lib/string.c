@@ -52,24 +52,23 @@ strlen(char *s)
 			  "jmp found\n"
 			  "notfound:\n"
 			  "xorl %%ecx, %%ecx\n" "found:\n":"=c" (result)
-			  :"S"(s)
+			  :"D"(s)
 			  :);
 	return result;
 }
 
-char *
-strcpy(char *dst, const char *src)
+char *strcpy(char *dst, const char *src)
 {
-	char c;
-	char *cpy = dst;
-	while (c = *src != '\0') {
-		*dst = c;
-		src++;
-		dst++;
-	}
-	*dst = c;
-	return cpy;
+    char *cpy = dst;
+    while (*src != '\0') {
+        *dst = *src;  // Copy the character from src to dst
+        src++;        // Move to the next character in src
+        dst++;        // Move to the next position in dst
+    }
+    *dst = '\0';  // Null-terminate the destination string
+    return cpy;   // Return the original destination pointer
 }
+
 
 char *
 strncpy(char *dst, const char *src, unsigned int size)
