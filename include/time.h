@@ -27,7 +27,7 @@
 #define PIT_BIN 0
 #define PIT_BCD 1
 
-#define HZ 1
+#define HZ 100
 #define DIVISOR 1193180/HZ
 
 void pit_int();

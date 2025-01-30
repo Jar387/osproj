@@ -33,7 +33,7 @@ list_delete(list_node_t * obj)
 void
 list_iter(list_node_t * head, int (*callback)(list_node_t *))
 {
-	if(head == NULL) {
+	if (head == NULL) {
 		return;
 	}
 
