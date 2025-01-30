@@ -40,5 +40,6 @@ void acpi_init();
 
 extern void volatile *apic_addr;
 extern void volatile *ioapic_addr;
+extern void volatile *hpet_addr;
 
 #endif

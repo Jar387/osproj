@@ -55,20 +55,6 @@ apic_init()
 	wrmsr(IA32_APIC_BASE_MSR, eax, edx);
 	lapic_write(LAPIC_SPR_INR_VEC,
 		    lapic_read(LAPIC_SPR_INR_VEC) | LAPIC_SPR_ENABLE);
-	// init apic timer
-	// figure out length of 1ms
-	lapic_write(LAPIC_TMR_DCR, 0x3);
-	lapic_write(LAPIC_TMR_ICR, 0xffffffff);
-
-	outb_p(0x43, 0x20);
-	outb_p(0x40, 0x2e);
-
-	lapic_write(LAPIC_TMR_ICR, 0xffffffff);
-
-	while (inb(0x40)) {
-	}
-	unsigned int offset = 0xffffffff - lapic_read(LAPIC_TMR_CCR);
-	lapic_write(LAPIC_TMR_DCR, 0x3);
-	lapic_write(LAPIC_TMR_ICR, offset);
-	lapic_write(LAPIC_LVR_TMR, 32 | 0x20000);
+	ioapic_write(0x14, 32);
+	ioapic_write(0x15, 0);
 }

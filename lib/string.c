@@ -57,18 +57,18 @@ strlen(char *s)
 	return result;
 }
 
-char *strcpy(char *dst, const char *src)
+char *
+strcpy(char *dst, const char *src)
 {
-    char *cpy = dst;
-    while (*src != '\0') {
-        *dst = *src;  // Copy the character from src to dst
-        src++;        // Move to the next character in src
-        dst++;        // Move to the next position in dst
-    }
-    *dst = '\0';  // Null-terminate the destination string
-    return cpy;   // Return the original destination pointer
+	char *cpy = dst;
+	while (*src != '\0') {
+		*dst = *src;	// Copy the character from src to dst
+		src++;		// Move to the next character in src
+		dst++;		// Move to the next position in dst
+	}
+	*dst = '\0';		// Null-terminate the destination string
+	return cpy;		// Return the original destination pointer
 }
-
 
 char *
 strncpy(char *dst, const char *src, unsigned int size)

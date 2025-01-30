@@ -12,6 +12,7 @@ static madt_t *madt;
 
 void volatile *apic_addr;
 void volatile *ioapic_addr;
+void volatile *hpet_addr;
 
 static unsigned char
 acpi_checksum(char *head, unsigned int length)
@@ -79,4 +80,6 @@ acpi_init()
 			break;
 		}
 	}
+	void **hpet_head = (void **) find_xsdt("HPET");
+	hpet_addr = phy2lin(hpet_head[11]);
 }
