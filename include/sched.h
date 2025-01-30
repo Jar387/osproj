@@ -49,7 +49,10 @@ typedef struct {
 	interrupt_stack_t int_stack;
 	sched_stack_t generic_stack;
 	unsigned int status;
+	char *pwd;
 } task_struct_t;
+
+extern task_struct_t *curr_task;
 
 void do_sched(sched_stack_t * stack_frame);
 void sched_init();

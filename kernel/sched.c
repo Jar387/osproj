@@ -12,6 +12,8 @@ static task_struct_t tss_list[MAX_TASK];
 static unsigned int used_index = 0;
 static unsigned int curr_index = 0;
 
+task_struct_t *curr_task;
+
 void *worker_stack_top;
 
 static unsigned int next_pid = 1;
@@ -25,6 +27,7 @@ new_tss(void *entry)
 	task_struct_t *new = tss_list + used_index;
 	memset(new, 0, sizeof (*new));
 	new->pid = next_pid;
+	new->pwd = "/";
 	next_pid++;
 	new->status = NEW;
 	new->int_stack.cs = 2 << 2;
@@ -98,4 +101,5 @@ do_sched(sched_stack_t * stack_frame)
 		switch_to(stack_frame, tss_list + curr_index);
 	}
 	tss_list[curr_index].status = RUNNING;
+	curr_task = tss_list + curr_index;
 }

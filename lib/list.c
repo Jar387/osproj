@@ -32,14 +32,16 @@ list_delete(list_node_t * obj)
 }
 
 void
-list_iter(list_node_t * head, void (*callback)(list_node_t *))
+list_iter(list_node_t * head, int (*callback)(list_node_t *))
 {
-	if (head == NULL) {
+	if(head == NULL) {
 		return;
 	}
 	list_node_t *curr = head;
 	do {
-		callback(curr);
+		if (callback(curr)) {
+			break;
+		}
 		curr = curr->next;
 	} while (curr != head);
 }

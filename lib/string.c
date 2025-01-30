@@ -35,6 +35,28 @@ memcmp(void *dst, void *src, unsigned int size)
 	return result;
 }
 
+unsigned int
+strlen(char *s)
+{
+	unsigned int result;
+	__asm__ volatile ("\n"
+			  "movl $0xffffffff, %%ecx\n"
+			  "movb $0, %%al\n"
+			  "cld\n"
+			  "repne\n"
+			  "scasb\n"
+			  "jne notfound\n"
+			  "subl $0xffffffff, %%ecx\n"
+			  "neg %%ecx\n"
+			  "dec %%ecx\n"
+			  "jmp found\n"
+			  "notfound:\n"
+			  "xorl %%ecx, %%ecx\n" "found:\n":"=c" (result)
+			  :"S"(s)
+			  :);
+	return result;
+}
+
 char *
 strcpy(char *dst, const char *src)
 {

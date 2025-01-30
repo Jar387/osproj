@@ -74,7 +74,8 @@ acpi_init()
 		if ((madt->entries)[i] != 1) {
 			i += (madt->entries)[i + 1];
 		} else {
-			ioapic_addr = phy2lin(*((void **) ((madt->entries) + i + 4)));
+			ioapic_addr =
+			    phy2lin(*((void **) ((madt->entries) + i + 4)));
 			break;
 		}
 	}
