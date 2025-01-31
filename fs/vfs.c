@@ -2,6 +2,7 @@
 #include <printk.h>
 #include <lib/list.h>
 #include <lib/string.h>
+#include <lib/bst.h>
 #include <stddef.h>
 #include <mm/slab.h>
 #include <sched.h>
@@ -9,14 +10,15 @@
 
 #define PATH_LEN(s) (sizeof(s)-1)
 
-list_node_t *mount_point_head;
-list_node_t *fs_driver_head;
+static list_node_t *mount_point_head;
 
-mount_point_t mount_point_root = {.driver_id = MINIX_FS_DRV,.path =
+static bst_node_t *fs_driver_head;
+
+static mount_point_t mount_point_root = {.driver_id = MINIX_FS_DRV,.path =
 	    "/",.path_len = PATH_LEN("/")
 };
 
-mount_point_t mount_point_dev = {.driver_id = DEVFS_FS_DRV,.path =
+static mount_point_t mount_point_dev = {.driver_id = DEVFS_FS_DRV,.path =
 	    "/dev",.path_len = PATH_LEN("/dev")
 };
 
@@ -91,6 +93,6 @@ fs_init()
 	list_insert(&mount_point_head, &mount_point_root);
 	list_insert(&mount_point_head, &mount_point_dev);
 
-	list_insert(&fs_driver_head, &minix_fs_drv);
-	list_insert(&fs_driver_head, &devfs_fs_drv);
+	bst_insert(&fs_driver_head, &minix_fs_drv, MINIX_FS_DRV);
+	bst_insert(&fs_driver_head, &devfs_fs_drv, DEVFS_FS_DRV);
 }

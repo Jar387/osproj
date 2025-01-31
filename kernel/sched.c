@@ -18,7 +18,7 @@ void *worker_stack_top;
 
 static unsigned int next_pid = 1;
 
-task_struct_t *
+static task_struct_t *
 new_tss(void *entry)
 {
 	if (used_index > MAX_TASK - 1) {

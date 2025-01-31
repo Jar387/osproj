@@ -1,6 +1,6 @@
 #include <printk.h>
 
-void
+static void
 dump_cpu()
 {
 	unsigned int eax, ebx, ecx, edx, esi, edi, esp, ebp;

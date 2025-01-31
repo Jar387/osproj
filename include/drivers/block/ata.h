@@ -58,9 +58,5 @@
 #define ATA_CMD_IDENTIFY 0xec
 
 void ata_init();
-void ata_test();
-
-extern void ata_prim_int();
-extern void ata_scnd_int();
 
 #endif

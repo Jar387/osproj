@@ -1,4 +1,5 @@
 #include <mm/buddy.h>
+#include <mm/mmap.h>
 #include <stddef.h>
 
 static page_t *memmap_kernel;
@@ -7,26 +8,6 @@ static page_t *memmap_end;
 
 static unsigned int kernel_mem_pages;
 static unsigned int user_mem_pages;
-
-static void *
-phy2virt(void *phy)
-{
-	if ((unsigned int) phy < 0x40000000) {
-		return phy + 0xc0000000;
-	} else {
-		return NULL;
-	}
-}
-
-static void *
-virt2phy(void *virt)
-{
-	if ((unsigned int) virt > 0xbfffffff) {
-		return virt - 0xc0000000;
-	} else {
-		return NULL;
-	}
-}
 
 void
 page_init(unsigned int total_mem)
@@ -81,7 +62,7 @@ palloc(int zone, unsigned int size)
 				}
 				if (zone == ZONE_KERNEL) {
 					return
-					    phy2virt((void *) ((index - size) <<
+					    phy2lin((void *) ((index - size) <<
 							       12));
 				}
 				if (zone == ZONE_USER) {

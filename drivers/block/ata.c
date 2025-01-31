@@ -61,21 +61,3 @@ ata_init()
 	identify_ata(SCND_CHNN_BASE, ATA_MASTER_DRV);
 	identify_ata(SCND_CHNN_BASE, ATA_SLAVE_DRV);
 }
-
-void
-do_ata_int()
-{
-}
-
-void
-ata_test()
-{
-	lock_kernel();
-	outb_p(0x1f2, 1);
-	outb_p(0x1f3, 2);
-	outb_p(0x1f4, 0);
-	outb_p(0x1f5, 0);
-	outb_p(0x1f6, 0x40);
-	outb_p(0x1f7, 0x20);
-	unlock_kernel();
-}

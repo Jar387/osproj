@@ -163,6 +163,7 @@ vga_console_init(struct multiboot_info *info, cdev_t * stdout)
 	stdout->read = NULL;
 	stdout->write = &vga_console_write;
 	stdout->ioctl = &vga_console_ioctl;
+	cls();
 	if (info->framebuffer_type != MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT) {
 		printk
 		    ("VGA card is in graphic mode! will use serial console at COM1\n");

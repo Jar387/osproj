@@ -56,6 +56,5 @@ extern task_struct_t *curr_task;
 
 void do_sched(sched_stack_t * stack_frame);
 void sched_init();
-task_struct_t *new_tss(void *entry);
 
 #endif

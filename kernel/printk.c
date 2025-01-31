@@ -82,36 +82,3 @@ printk(const char *fmt, ...)
 		c = *fmt;
 	}
 }
-
-void
-printk_s(const char *fmt, ...)
-{
-	lock_kernel();
-	va_list varlist;
-	va_start(varlist, fmt);
-
-	char c = *fmt;
-	while (c != '\0') {
-		if (c == '%') {
-			// start fmt
-			fmt++;
-			c = *fmt;
-			switch (c) {
-			case 'x':
-				printhex(va_arg(varlist, int));
-				goto fin;
-			case 's':
-				printk(va_arg(varlist, char *));
-				goto fin;
-			case 'i':
-				printint(va_arg(varlist, int));
-				goto fin;
-			}
-		}
-		putchar(c);
-	      fin:
-		fmt++;
-		c = *fmt;
-	}
-	unlock_kernel();
-}

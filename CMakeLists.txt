@@ -10,7 +10,7 @@ set(CMAKE_LINKER "i686-linux-gnu-gcc-5")
 set(CMAKE_AR "i686-linux-gnu-ar")
 
 # Set compiler flags
-set(CMAKE_C_FLAGS "-std=gnu99 -finline-functions -ffreestanding -I${CMAKE_SOURCE_DIR}/include -g -O3")
+set(CMAKE_C_FLAGS "-std=gnu99 -finline-functions -ffreestanding -I${CMAKE_SOURCE_DIR}/include -O3")
 set(CMAKE_EXE_LINKER_FLAGS "-T${CMAKE_SOURCE_DIR}/link.ld -ffreestanding -nostdlib")
 
 # Add subdirectories
