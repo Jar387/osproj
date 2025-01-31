@@ -36,7 +36,7 @@ memcmp(void *dst, void *src, unsigned int size)
 }
 
 unsigned int
-strlen(char *s)
+strlen(const char *s)
 {
 	unsigned int result;
 	__asm__ volatile ("\n"

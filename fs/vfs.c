@@ -6,6 +6,7 @@
 #include <stddef.h>
 #include <mm/slab.h>
 #include <sched.h>
+#include <errno.h>
 #include <asm/ring0.h>
 
 #define PATH_LEN(s) (sizeof(s)-1)
@@ -13,6 +14,8 @@
 static list_node_t *mount_point_head;
 
 static bst_node_t *fs_driver_head;
+
+static bst_node_t *fd_head;
 
 static mount_point_t mount_point_root = {.driver_id = MINIX_FS_DRV,.path =
 	    "/",.path_len = PATH_LEN("/")
@@ -56,8 +59,8 @@ get_fs_type_callback(list_node_t * m)
 	return 0;
 }
 
-static void
-get_fs_type(char *path, char **baked, int *fs_type)
+static int
+get_fs_type(const char *path, const char **baked, int *fs_type)
 {
 	char *buf;
 	mp_swap = NULL;
@@ -78,13 +81,105 @@ get_fs_type(char *path, char **baked, int *fs_type)
 	if (mp_swap == NULL) {
 		*baked = NULL;
 		*fs_type = 0;
-		return;
+		kfree(buf);
+		return 1;
 	}
 	*baked = path + mp_swap->path_len;
 	if ((**baked) == '/') {
 		(*baked)++;
 	}
+	kfree(buf);
 	*fs_type = mp_swap->driver_id;
+	return 0;
+}
+
+static int
+get_fd_info(int id, int *type, int *inode)
+{
+	fd_t *fd = (fd_t *) bst_search(fd_head, id);
+	if (fd == NULL) {
+		return 1;
+	}
+	*type = fd->driver_id;
+	*inode = fd->internal_inode;
+	return 0;
+}
+
+int
+fs_close(int fd)
+{
+	int type, inode;
+	if (get_fd_info(fd, &type, &inode)) {
+		return -ENFILE;
+	}
+	int (*close)(int) =
+	    ( (fs_driver_t *) bst_search(fs_driver_head, type))->ptrs.close;
+	if (close == NULL) {
+		return -EPERM;
+	}
+	return close(inode);
+}
+
+int
+fs_mkdir(const char *path, unsigned short mode)
+{
+	const char *baked;
+	int type;
+	if (get_fs_type(path, &baked, &type)) {
+		return -ENOENT;
+	}
+	int (*mkdir)(const char *, unsigned short) =
+	    ( (fs_driver_t *) bst_search(fs_driver_head, type))->ptrs.mkdir;
+	if (mkdir == NULL) {
+		return -EPERM;
+	}
+	return mkdir(baked, mode);
+}
+
+int
+fs_open(const char *path, int oflag)
+{
+	const char *baked;
+	int type;
+	if (get_fs_type(path, &baked, &type)) {
+		return -ENOENT;
+	}
+	int (*open)(const char *, int) =
+	    ( (fs_driver_t *) bst_search(fs_driver_head, type))->ptrs.open;
+	if (open == NULL) {
+		return -EPERM;
+	}
+	return open(baked, oflag);
+}
+
+int
+fs_read(int fd, void *buf, int nbytes)
+{
+	int type, inode;
+	if (get_fd_info(fd, &type, &inode)) {
+		return -ENFILE;
+	}
+	int (*read)(int, void *, int) =
+	    ( (fs_driver_t *) bst_search(fs_driver_head, type))->ptrs.read;
+	if (read == NULL) {
+		return -EPERM;
+	}
+	return read(inode, buf, nbytes);
+}
+
+int
+fs_write(int fd, const void *buf, int nbytes)
+{
+	int type, inode;
+	if (get_fd_info(fd, &type, &inode)) {
+		return -ENFILE;
+	}
+	int (*write)(int, const void *, int) =
+	    ( (fs_driver_t *) bst_search(fs_driver_head, type))->ptrs.write;
+	if (write == NULL) {
+		return -EPERM;
+	}
+	return write(inode, buf, nbytes);
 }
 
 void

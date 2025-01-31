@@ -4,7 +4,7 @@
 void memcpy(void *dst, void *src, unsigned int size);
 void memset(void *dst, unsigned int c, unsigned int size);
 int memcmp(void *dst, void *src, unsigned int size);
-unsigned int strlen(char *s);
+unsigned int strlen(const char *s);
 char *strcpy(char *dst, const char *src);
 char *strncpy(char *dst, const char *src, unsigned int size);
 char *strcat(char *dst, const char *src);

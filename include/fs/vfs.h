@@ -15,17 +15,24 @@ typedef struct {		// vfs layer convert path like "/dev/bus/pci/1:0" to "bus/pci/
 	int (*dup2)(int fd, int fd2);
 	int (*getdirentries)(int fd, char *buf, int nbytes, long *basep);
 	int (*link)(const char *name1, const char *name2);
-	unsigned long (*lseek)(int fd, unsigned long offset, int whence);
+	int (*lseek)(int fd, int offset, int whence);
 	int (*mkdir)(const char *path, unsigned short mode);
 	int (*mkfifo)(const char *path, unsigned short mode);
 	int (*open)(const char *path, int oflag);
 	int (*pipe)(int fd[2]);
-	unsigned long (*read)(int d, void *buf, unsigned long nbytes);
+	int (*read)(int fd, void *buf, int nbytes);
 	int (*rename)(const char *from, const char *to);
 	int (*rmdir)(const char *path);
-	int (*truncate)(const char *path, unsigned long length);
-	unsigned long (*write)(int d, const void *buf, unsigned long nbytes);
+	int (*truncate)(const char *path, int length);
+	int (*write)(int fd, const void *buf, int nbytes);
 } posix_fs_interface_t;
+
+// syscall interface
+int fs_close(int fd);
+int fs_mkdir(const char *path, unsigned short mode);
+int fs_open(const char *path, int oflag);
+int fs_read(int fd, void *buf, int nbytes);
+int fs_write(int fd, const void *buf, int nbytes);
 
 typedef struct {
 	int driver_id;
