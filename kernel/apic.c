@@ -43,6 +43,20 @@ eoi_apic()
 }
 
 void
+ioapic_enable(unsigned char target_vector, unsigned char pin)
+{
+	ioapic_write(0x10 + 2 * pin, target_vector);
+	ioapic_write(0x10 + 2 * pin + 1, 0);
+}
+
+void
+ioapic_disable(unsigned char pin)
+{
+	ioapic_write(0x10 + 2 * pin, 1 << 16 | ioapic_read(0x10 + 2 * pin));
+	ioapic_write(0x10 + 2 * pin + 1, 0);
+}
+
+void
 apic_init()
 {
 	// disable 8259 pic
@@ -55,6 +69,4 @@ apic_init()
 	wrmsr(IA32_APIC_BASE_MSR, eax, edx);
 	lapic_write(LAPIC_SPR_INR_VEC,
 		    lapic_read(LAPIC_SPR_INR_VEC) | LAPIC_SPR_ENABLE);
-	ioapic_write(0x14, 32);
-	ioapic_write(0x15, 0);
 }

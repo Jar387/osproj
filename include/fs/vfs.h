@@ -25,20 +25,20 @@ typedef struct {		// vfs layer convert path like "/dev/bus/pci/1:0" to "bus/pci/
 	int (*rmdir)(const char *path);
 	int (*truncate)(const char *path, unsigned long length);
 	unsigned long (*write)(int d, const void *buf, unsigned long nbytes);
-} posix_fs_interface;
+} posix_fs_interface_t;
 
 typedef struct {
 	int driver_id;
 	int internal_inode;
 	int id;
-} fd;
+} fd_t;
 
 typedef struct {
 	unsigned char is_mem;
 	unsigned int block_size;
 	char *name;
 	unsigned char (*check_type)(char *superblock);
-	posix_fs_interface ptrs;
+	posix_fs_interface_t ptrs;
 	int id;
 } fs_driver_t;
 

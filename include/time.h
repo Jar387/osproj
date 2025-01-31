@@ -2,7 +2,6 @@
 #define TIME_H
 
 // pit chip
-#define PIT_IRQ 0
 
 #define PIT_DATA0 0x40
 #define PIT_DATA1 0x41
@@ -29,6 +28,9 @@
 
 #define HZ 100
 #define DIVISOR 1193180/HZ
+
+#define PIT_PIN 2
+#define PIT_VECTOR 32
 
 void pit_int();
 void pit_init();

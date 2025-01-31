@@ -3,6 +3,9 @@
 
 void apic_init();
 
+void ioapic_enable(unsigned char target_vector, unsigned char pin);
+void ioapic_disable(unsigned char pin);
+
 void eoi_apic();
 
 #define IA32_APIC_BASE_MSR 0x1B

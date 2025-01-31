@@ -88,9 +88,9 @@ get_fs_type(char *path, char **baked, int *fs_type)
 void
 fs_init()
 {
-	mount_point_head = list_insert(NULL, &mount_point_root);
-	list_insert(mount_point_head, &mount_point_dev);
+	list_insert(&mount_point_head, &mount_point_root);
+	list_insert(&mount_point_head, &mount_point_dev);
 
-	fs_driver_head = list_insert(fs_driver_head, &minix_fs_drv);
-	list_insert(fs_driver_head, &devfs_fs_drv);
+	list_insert(&fs_driver_head, &minix_fs_drv);
+	list_insert(&fs_driver_head, &devfs_fs_drv);
 }

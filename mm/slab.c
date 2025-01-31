@@ -85,7 +85,7 @@ __kmalloc(unsigned int size, unsigned int flags, kmem_cache_t * quickalloc)
 		for (int i = 0; i < 12; i++) {
 			sz >>= 1;
 			if (sz == 0) {
-				kmem = quick_alloc_table[i];
+				kmem = quick_alloc_table[i + 1];	// fixme: investigate this patch
 				break;
 			}
 		}
