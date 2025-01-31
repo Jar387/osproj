@@ -63,7 +63,7 @@ palloc(int zone, unsigned int size)
 				if (zone == ZONE_KERNEL) {
 					return
 					    phy2lin((void *) ((index - size) <<
-							       12));
+							      12));
 				}
 				if (zone == ZONE_USER) {
 					return (void *) ((index - size) << 12);

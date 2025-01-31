@@ -76,6 +76,14 @@ cls()
 		*dst = '\0';
 		dst += 2;
 	}
+	x = 0;
+	y = 0;
+	outb_p(0x3D4, 0x0A);
+	outb_p(0x3D5, (inb(0x3D5) & 0xC0) | 14);
+
+	outb_p(0x3D4, 0x0B);
+	outb_p(0x3D5, (inb(0x3D5) & 0xE0) | 15);
+	move_cursor(0, 0);
 }
 
 static int

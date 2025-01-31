@@ -11,8 +11,8 @@ typedef struct bdev_t {
 } bdev_t;
 
 void blkdev_load();
-int creat_bdev(int dev_num, int (*read)(char *, int), int (*write)(char *, int),
-	       int (*ioctl)(long), int (*seek)(long, int));
+int creat_bdev(int dev_num, int (*read)(char *, int), int(*write)(char *, int),
+	       int(*ioctl)(long), int(*seek)(long, int));
 int bread(int dev, char *buf, int count);
 int bwrite(int dev, char *buf, int count);
 int bioctl(int dev, long cmd);
