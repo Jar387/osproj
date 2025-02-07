@@ -1,127 +1,74 @@
 #include <stddef.h>
 #include <mm/slab.h>
-#include <multiboot.h>
-#include <drivers/char/vga_console.h>
+#include <errno.h>
+#include <lib/bst.h>
+#include <drivers/char/devmem.h>
+#include <drivers/char/tty.h>
 #include <drivers/char/pci.h>
 #include <drivers/char.h>
+bst_node_t *chardev_root;
 
-static cdev_t preload_console = {
-	.dev_num = CDEV_STDOUT,
-	.read = NULL,
-	.write = NULL,
-	.ioctl = NULL,
-	.next = NULL
-};
-
-// char nodes list
-static cdev_t *head;
-static cdev_t *tail;
-
-// quick-search cache
-static cdev_t *stdout;
-static cdev_t *stdin;
-static cdev_t *stderr;
-static cdev_t *last;
-
-int
-cdev_preload(struct multiboot_info *info)
+void
+load_graphic()
 {
-	stdout = &preload_console;
-	stderr = &preload_console;
-	vga_console_init(info, stdout);
+	preinit_tty();
 }
 
-int
-cdev_load(struct multiboot_info *info)
+void
+cdev_load()
 {
+	init_devmem();
+	init_tty();
 	init_pci();
 }
 
 int
-creat_cdev(int dev_num, int (*read)(char *, int), int (*write)(char *, int),
-	   int (*ioctl)(long))
+creat_cdev(short major, int (*read)(short), int (*write)(short, char),
+	   int (*ioctl)(short, long))
 {
-	cdev_t *new_dev = kmalloc(sizeof (cdev_t));
-	if (head == NULL) {
-		head = new_dev;
-		tail = head;
-	} else {
-		tail->next = (struct CDEV *) new_dev;
-		tail = new_dev;
-	}
-	new_dev->dev_num = dev_num;
-	new_dev->read = read;
-	new_dev->write = write;
-	new_dev->ioctl = ioctl;
-	new_dev->next = NULL;
-}
-
-static cdev_t *
-search_cdev(int dev)
-{
-	cdev_t *do_dev = head;
-	// try to hit cache
-	if (stdin != NULL) {
-		if (dev == stdin->dev_num) {
-			return stdin;
-		}
-	}
-	if (stdout != NULL) {
-		if (dev == stdout->dev_num) {
-			return stdout;
-		}
-	}
-	if (stderr != NULL) {
-		if (dev == stderr->dev_num) {
-			return stderr;
-		}
-	}
-	if (last != NULL) {
-		if (dev == last->dev_num) {
-			return last;
-		}
-	}
-	// cache not hit
-	if (head == NULL) {
-		return NULL;
-	}
-	while (do_dev->next != NULL) {
-		if (do_dev->dev_num == dev) {
-			last = do_dev;
-			return do_dev;
-		}
-		do_dev = (cdev_t *) (do_dev->next);
-	}
-
-	return NULL;
+	cdev_t *newdev = (cdev_t *) kmalloc(sizeof(*newdev));
+	newdev->major = major;
+	newdev->read = read;
+	newdev->write = write;
+	newdev->ioctl = ioctl;
+	bst_insert(&chardev_root, newdev, (int) major);
 }
 
 int
-cread(int dev, char *buf, int count)
+cread(short major, short minor)
 {
-	cdev_t *cdev = search_cdev(dev);
-	if (cdev != NULL && cdev->read != NULL) {
-		return cdev->read(buf, count);
+	cdev_t *dev = bst_search(chardev_root, (int) major);
+	if (dev == NULL) {
+		return -ENODEV;
 	}
-	return -1;
+	if (dev->read == NULL) {
+		return -ENODEV;
+	}
+	return (dev->read) (minor);
 }
 
 int
-cwrite(int dev, char *buf, int count)
+cwrite(short major, short minor, char data)
 {
-	cdev_t *cdev = search_cdev(dev);
-	if (cdev != NULL && cdev->write != NULL) {
-		return cdev->write(buf, count);
+	cdev_t *dev = bst_search(chardev_root, (int) major);
+	if (dev == NULL) {
+		return -ENODEV;
 	}
-	return -1;
+	if (dev->write == NULL) {
+		return -ENODEV;
+	}
+	return (dev->write) (minor, data);
 }
 
 int
-ioctl(int dev, long cmd)
+cioctl(short major, short minor, long cmd)
 {
-	cdev_t *cdev = search_cdev(dev);
-	if (cdev != NULL && cdev->ioctl != NULL) {
-		return cdev->ioctl(cmd);
+	cdev_t *dev = bst_search(chardev_root, (int) major);
+	if (dev == NULL) {
+		return -ENODEV;
 	}
-	return -1;
+	if (dev->ioctl == NULL) {
+		return -ENODEV;
+	}
+	return (dev->ioctl) (minor, cmd);
 }

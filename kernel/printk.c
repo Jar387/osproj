@@ -1,12 +1,7 @@
 #include <drivers/char.h>
 #include <stdarg.h>
 #include <asm/ring0.h>
-
-static inline void
-putchar(char c)
-{
-	cwrite(CDEV_STDOUT, &c, 1);
-}
+#include <drivers/char/tty.h>
 
 static inline void
 puthex(unsigned char hex)

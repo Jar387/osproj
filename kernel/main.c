@@ -1,3 +1,4 @@
+#include <kernel.h>
 #include <asm/ring0.h>
 #include <cpu.h>
 #include <multiboot.h>
@@ -9,17 +10,20 @@
 #include <time.h>
 #include <fs/vfs.h>
 
+struct multiboot_info *multiboot_config;
+
 void
 kmain(struct multiboot_info *info)
 {
 	lock_kernel();
-	cdev_preload(info);
+	multiboot_config = info;
+	load_graphic();
 	printk("Setting up hardwares\n");
 	arch_init();
-	mm_init(info->mem_upper, info->mem_lower);
+	mm_init();
 	blkdev_load();
 	fs_init();
-	cdev_load(info);
+	cdev_load();
 	pit_init();
 	sched_init();
 	printk("hardware setup done\n");

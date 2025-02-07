@@ -9,6 +9,7 @@
     } \
 })
 
+extern struct multiboot_info *multiboot_config;
 void kmain(struct multiboot_info *info);
 void init();
 

@@ -1,9 +1,12 @@
 #include <asm/ring0.h>
 #include <multiboot.h>
 #include <drivers/char.h>
-#include <drivers/char/vga_console.h>
+#include <drivers/char/tty.h>
 #include <printk.h>
+#include <panic.h>
 #include <stddef.h>
+#include <kernel.h>
+#include <mm/mmap.h>
 
 static int VRAM;
 
@@ -86,7 +89,7 @@ cls()
 	move_cursor(0, 0);
 }
 
-static int
+int
 putchar(char c)
 {
 	switch (c) {
@@ -146,18 +149,16 @@ putchar(char c)
 }
 
 int
-vga_console_write(char *buf, int count)
+tty_write(short minor, char data)
 {
-	for (int i = 0; i < count; i++) {
-		putchar(buf[i]);
-	}
+	putchar(data);
 }
 
 static int
-vga_console_ioctl(long cmd)
+tty_ioctl(short minor, long cmd)
 {
 	switch (cmd) {
-	case VGA_CONSOLE_IOCMD_CLS:
+	case TTY_CLEAR:
 		cls();
 	default:
 		return -1;
@@ -165,15 +166,18 @@ vga_console_ioctl(long cmd)
 }
 
 void
-vga_console_init(struct multiboot_info *info, cdev_t * stdout)
+preinit_tty()
 {
+	struct multiboot_info *info = multiboot_config;
 	VRAM = info->framebuffer_addr + 0xc0000000;
-	stdout->read = NULL;
-	stdout->write = &vga_console_write;
-	stdout->ioctl = &vga_console_ioctl;
-	cls();
 	if (info->framebuffer_type != MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT) {
-		printk
-		    ("VGA card is in graphic mode! will use serial console at COM1\n");
+		panic("unsupported graphic mode");
 	}
+	cls();
+}
+
+void
+init_tty()
+{
+	creat_cdev(MAJOR_TTY, NULL, tty_write, tty_ioctl);
 }

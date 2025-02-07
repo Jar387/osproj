@@ -1,27 +1,27 @@
 #ifndef DRIVERS_CHAR_H
 #define DRIVERS_CHAR_H
 
-#define CDEV_STDOUT 1
-#define CDEV_STDIN 2
-#define CDEV_STDERR 3
+#define MAJOR_NULL 0
+#define MAJOR_MEM 1
+#define MAJOR_TTY 2
 
 #include <multiboot.h>
 
 typedef struct {
-	int dev_num;
-	int (*read)(char *, int);
-	int (*write)(char *, int);
-	int (*ioctl)(long);
-	struct CDEV *next;
+	short major;
+	int (*read)(short);
+	int (*write)(short, char);
+	int (*ioctl)(short, long);
 } cdev_t;
 
-int cdev_preload(struct multiboot_info *info);
-int cdev_load(struct multiboot_info *info);
+void load_graphic();
 
-int creat_cdev(int dev_num, int (*read)(char *, int), int (*write)(char *, int),
-	       int (*ioctl)(long));
-int cread(int dev, char *buf, int count);
-int cwrite(int dev, char *buf, int count);
-int ioctl(int dev, long cmd);
+void cdev_load();
+
+int creat_cdev(short major, int (*read)(short), int (*write)(short, char),
+	       int (*ioctl)(short, long));
+int cread(short major, short minor);
+int cwrite(short major, short minor, char data);
+int cioctl(short major, short minor, long cmd);
 
 #endif
