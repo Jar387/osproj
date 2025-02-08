@@ -14,7 +14,6 @@
 #define PORT_DEV_HI 0xffff
 #define PORT_DEV_LO 0
 
-
 void init_devmem();
 
 #endif

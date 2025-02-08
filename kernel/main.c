@@ -37,6 +37,9 @@ void
 init()
 {
 	printk("running init\n");
+	for (int i = 0; i < 11; i++) {
+		printk("aaa\n");
+	}
 	for (;;) {
 		hlt();
 	}
