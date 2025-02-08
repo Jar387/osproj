@@ -3,6 +3,12 @@
 #include <asm/ring0.h>
 #include <drivers/char/tty.h>
 
+static void
+putchar(char c)
+{
+	tty_write(0, c);
+}
+
 static inline void
 puthex(unsigned char hex)
 {

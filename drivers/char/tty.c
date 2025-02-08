@@ -19,11 +19,19 @@ static char back;
 
 static int command_sequence_status = 0;
 
-static char command_buf[16] = { 0 };
+#define CMD_BUF_SZ 32
+static char command_buf[CMD_BUF_SZ] = { 0 };
 
 static int buf_ptr = 0;
 
-static int
+static char jmptable[16] =
+    { VGA_BLACK, VGA_RED, VGA_GREEN, VGA_BROWN, VGA_BLUE, VGA_PURPLE, VGA_CYAN,
+	VGA_GRAY, VGA_DARK_GRAY, VGA_LIGHT_RED, VGA_LIGHT_GREEN, VGA_YELLOW,
+	    VGA_LIGHT_BLUE,
+	VGA_LIGHT_PURPLE, VGA_LIGHT_CYAN, VGA_WHITE
+};
+
+static inline int
 atoi(char *dec, char terminator)
 {
 	int i = 0;
@@ -45,16 +53,31 @@ atoi(char *dec, char terminator)
 	return result;
 }
 
-static int
-is_number(char c)
+static inline int
+atoi_comma(char *dec, int *second)
 {
-	return ((c >= '0') && (c <= '9'));
+	for (int i = 0; i < CMD_BUF_SZ; i++) {
+		if (dec[i] == ';') {
+			int result = atoi(dec, ';');
+			dec += (i + 1);
+			*second = atoi(dec, 0);
+			return result;
+		}
+	}
+	*second = -1;
+	return atoi(dec, 0);
+}
+
+static inline int
+is_number_or_comma(char c)
+{
+	return (((c >= '0') && (c <= '9')) || (c == ';'));
 }
 
 static int
 move_cursor(unsigned int x, unsigned int y)
 {
-	if (x >= VGA_COLUMN || y >= VGA_ROW) {
+	if (x >= (VGA_COLUMN + 1) || y >= (VGA_ROW + 1)) {
 		return -1;	// error
 	}
 	unsigned short pos = y * VGA_COLUMN + x;
@@ -84,7 +107,7 @@ scrup()
 	char *dst = (char *) (VRAM);
 	char *src = (char *) (VRAM + 2 * VGA_COLUMN);
 	char c;
-	while (src != (char *) (VRAM + 2 * VGA_COLUMN * VGA_ROW)) {
+	while (src != (char *) (VRAM + 2 * VGA_COLUMN * (VGA_ROW + 1))) {
 		c = *src;
 		*dst = c;
 		src++;
@@ -114,7 +137,7 @@ static void
 cls()
 {
 	char *dst = (char *) (VRAM);
-	for (int i = 0; i < VGA_COLUMN * VGA_ROW; i++) {
+	for (int i = 0; i < VGA_COLUMN * (VGA_ROW + 1); i++) {
 		*dst = '\0';
 		*(dst + 1) = ASSEMB_COLOUR;
 		dst += 2;
@@ -129,7 +152,7 @@ cls()
 	move_cursor(0, 0);
 }
 
-int
+static int
 putchar(char c)
 {
 	switch (c) {
@@ -176,17 +199,19 @@ putchar(char c)
 		move_cursor(x, y);
 		return 0;
 	}
-	if (y == VGA_ROW && x == 79) {
-		// need scrup
-		x = 0;
-		scrup();
-	}
 	int pos = y * VGA_COLUMN + x;
 	pos *= 2;
 	char *vram = (char *) VRAM;
 	vram[pos] = c;
 	vram[pos + 1] = ASSEMB_COLOUR;
-	step_cursor();
+	if (y == VGA_ROW && x == 79) {
+		// need scrup
+		x = 0;
+		scrup();
+		move_cursor(x, y);
+	} else {
+		step_cursor();
+	}
 }
 
 int
@@ -201,51 +226,68 @@ tty_write(short minor, char data)
 		return 0;
 	}
 	if (command_sequence_status == 2) {
-		if (!is_number(data)) {
+		if (is_number_or_comma(data)) {
 			command_buf[buf_ptr] = data;
 			buf_ptr++;
-			if (buf_ptr >= 10) {
+			return 0;
+			if (buf_ptr >= CMD_BUF_SZ - 1) {
 				goto terminate_sequence;
 			}
 		} else {
-			int num = atoi(command_buf, 0);
+			int second;
+			int num = atoi_comma(command_buf, &second);
 			switch (data) {
 			case 'A':
 				y -= num;
-				break;
+				goto terminate_sequence;
 			case 'B':
 				y += num;
-				break;
+				goto terminate_sequence;
 			case 'C':
 				x += num;
-				break;
+				goto terminate_sequence;
 			case 'D':
 				x -= num;
-				break;
+				goto terminate_sequence;
 			case 'E':
 				x = 0;
 				y += num;
-				break;
+				goto terminate_sequence;
 			case 'F':
 				x = 0;
 				y -= num;
-				break;
+				goto terminate_sequence;
 			case 'G':
 				x = num;
-				break;
+				goto terminate_sequence;
 			case 'H':
 				x = 0;
 				y = 0;
-				break;
+				goto terminate_sequence;
 			case 'J':
 			case 'K':
 			case 'S':
 			case 'T':
 				cls();
-				break;
+				goto terminate_sequence;
 			case 'm':
-
-				break;
+				if (num == 0) {
+					fore = DEFAULT_FORE;
+					back = DEFAULT_BACK;
+				}
+				if (num >= 30 && num <= 37) {
+					fore = jmptable[num - 30];
+				}
+				if (num == 1 && second >= 30 && second <= 37) {
+					fore = jmptable[second - 30 + 8];
+				}
+				if (num >= 40 && num <= 47) {
+					back = jmptable[num - 40];
+				}
+				if (num == 1 && second >= 40 && second <= 47) {
+					back = jmptable[second - 40 + 8];
+				}
+				goto terminate_sequence;
 			default:
 				goto terminate_sequence;
 			}
@@ -255,18 +297,7 @@ tty_write(short minor, char data)
       terminate_sequence:
 	command_sequence_status = 0;
 	buf_ptr = 0;
-	memset(command_buf, 0, 16);
-}
-
-static int
-tty_ioctl(short minor, long cmd)
-{
-	switch (cmd) {
-	case TTY_CLEAR:
-		cls();
-	default:
-		return -1;
-	}
+	memset(command_buf, 0, CMD_BUF_SZ);
 }
 
 void
@@ -274,8 +305,8 @@ preinit_tty()
 {
 	struct multiboot_info *info = multiboot_config;
 	VRAM = info->framebuffer_addr + 0xc0000000;
-	fore = VGA_GREEN;
-	back = VGA_BLUE;
+	fore = DEFAULT_FORE;
+	back = DEFAULT_BACK;
 	if (info->framebuffer_type != MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT) {
 		panic("unsupported graphic mode");
 	}
@@ -285,5 +316,5 @@ preinit_tty()
 void
 init_tty()
 {
-	creat_cdev(MAJOR_TTY, NULL, tty_write, tty_ioctl);
+	creat_cdev(MAJOR_TTY, NULL, tty_write, NULL);
 }

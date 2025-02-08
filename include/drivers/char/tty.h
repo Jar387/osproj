@@ -5,7 +5,7 @@
 void preinit_tty();
 void init_tty();
 
-int putchar(char c);		// for pre-arch_init debug use
+int tty_write(short minor, char data);	// for pre-arch_init debug use
 		     // do not abuse :)
 
 #define VGA_BLACK 0
@@ -25,12 +25,12 @@ int putchar(char c);		// for pre-arch_init debug use
 #define VGA_YELLOW 14
 #define VGA_WHITE 15
 
-#define DEFAULT_FORE VGA_WHITE
+#define DEFAULT_FORE VGA_GRAY
 #define DEFAULT_BACK VGA_BLACK
 
 #define ASSEMB_COLOUR ((back<<4)+fore)
 
-#define VGA_ROW 25
+#define VGA_ROW 24
 #define VGA_COLUMN 80
 
 #endif

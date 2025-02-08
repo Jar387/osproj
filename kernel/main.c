@@ -37,9 +37,8 @@ void
 init()
 {
 	printk("running init\n");
-	for (int i = 0; i < 11; i++) {
-		printk("aaa\n");
-	}
+	printk
+	    ("\033[31mc\033[32mo\033[33ml\033[1;33mo\033[35mr\033[36mf\033[37mu\033[1;31ml\n");
 	for (;;) {
 		hlt();
 	}
