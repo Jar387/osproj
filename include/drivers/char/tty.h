@@ -1,7 +1,6 @@
 #ifndef TTY_H
 #define TTY_H
 
-#define TTY_CLEAR 1
 void preinit_tty();
 void init_tty();
 
@@ -32,5 +31,8 @@ int tty_write(short minor, char data);	// for pre-arch_init debug use
 
 #define VGA_ROW 24
 #define VGA_COLUMN 80
+
+#define MINOR_TTY_SELECT 0
+#define MINOR_TTY_TTY1 1
 
 #endif

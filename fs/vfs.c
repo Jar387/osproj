@@ -113,7 +113,7 @@ fs_close(int fd)
 		return -ENFILE;
 	}
 	int (*close)(int) =
-	    ( (fs_driver_t *) bst_search(fs_driver_head, type))->ptrs.close;
+	    ((fs_driver_t *) bst_search(fs_driver_head, type))->ptrs.close;
 	if (close == NULL) {
 		return -EPERM;
 	}
@@ -129,7 +129,7 @@ fs_mkdir(const char *path, unsigned short mode)
 		return -ENOENT;
 	}
 	int (*mkdir)(const char *, unsigned short) =
-	    ( (fs_driver_t *) bst_search(fs_driver_head, type))->ptrs.mkdir;
+	    ((fs_driver_t *) bst_search(fs_driver_head, type))->ptrs.mkdir;
 	if (mkdir == NULL) {
 		return -EPERM;
 	}
@@ -145,7 +145,7 @@ fs_open(const char *path, int oflag)
 		return -ENOENT;
 	}
 	int (*open)(const char *, int) =
-	    ( (fs_driver_t *) bst_search(fs_driver_head, type))->ptrs.open;
+	    ((fs_driver_t *) bst_search(fs_driver_head, type))->ptrs.open;
 	if (open == NULL) {
 		return -EPERM;
 	}
@@ -160,7 +160,7 @@ fs_read(int fd, void *buf, int nbytes)
 		return -ENFILE;
 	}
 	int (*read)(int, void *, int) =
-	    ( (fs_driver_t *) bst_search(fs_driver_head, type))->ptrs.read;
+	    ((fs_driver_t *) bst_search(fs_driver_head, type))->ptrs.read;
 	if (read == NULL) {
 		return -EPERM;
 	}
@@ -175,7 +175,7 @@ fs_write(int fd, const void *buf, int nbytes)
 		return -ENFILE;
 	}
 	int (*write)(int, const void *, int) =
-	    ( (fs_driver_t *) bst_search(fs_driver_head, type))->ptrs.write;
+	    ((fs_driver_t *) bst_search(fs_driver_head, type))->ptrs.write;
 	if (write == NULL) {
 		return -EPERM;
 	}

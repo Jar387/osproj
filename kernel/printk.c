@@ -6,7 +6,7 @@
 static void
 putchar(char c)
 {
-	tty_write(0, c);
+	tty_write(MINOR_TTY_TTY1, c);
 }
 
 static inline void

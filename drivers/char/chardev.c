@@ -23,10 +23,10 @@ cdev_load()
 }
 
 int
-creat_cdev(short major, int (*read)(short), int (*write)(short, char),
-	   int (*ioctl)(short, long))
+creat_cdev(short major, int (*read)(short), int(*write)(short, char),
+	   int(*ioctl)(short, long))
 {
-	cdev_t *newdev = (cdev_t *) kmalloc(sizeof(*newdev));
+	cdev_t *newdev =(cdev_t *) kmalloc(sizeof (*newdev));
 	newdev->major = major;
 	newdev->read = read;
 	newdev->write = write;

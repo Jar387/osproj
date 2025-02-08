@@ -34,14 +34,14 @@ dump_cpu()
 			  "=d"(fs), "=D"(gs), "=S"(ss)
 			  :);
 	printk
-	    ("eax=%x, ebx=%x, ecx=%x, edx=%x\nedi=%x, esi=%x, ebp=%x, esp=%x\n\
-cs=%x, ss=%x, ds=%x, es=%x, fs=%x, gs=%x\n\
-current eip=%x, cr0=%x, cr2=%x, cr3=%x\n\
+	    ("eax=%p, ebx=%p, ecx=%p, edx=%p\nedi=%p, esi=%p, ebp=%p, esp=%p\n\
+cs=%p, ss=%p, ds=%p, es=%p, fs=%p, gs=%p\n\
+current eip=%p, cr0=%p, cr2=%p, cr3=%p\n\
 -----------------------------------CALL STACK-----------------------------------", eax, ebx, ecx, edx, edi, esi, ebp, esp, cs, ss, ds, es, fs, gs, eip, cr0, cr2, pdbr);
 	unsigned int *stack = (unsigned int *) esp;
 	for (int i = 0; i < 5; i++) {
 		for (int j = 0; j < 8; j++) {
-			printk("%x ", *stack);
+			printk("%p ", *stack);
 			stack--;
 		}
 		if (i == 25 - 7) {
