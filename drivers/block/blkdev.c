@@ -14,7 +14,7 @@ static bdev_t *last;
 void
 blkdev_load()
 {
-	// ata_init();
+	ata_init();
 }
 
 int

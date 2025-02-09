@@ -1,12 +1,11 @@
 #include <drivers/block/ata.h>
+#include <drivers/pci.h>
 #include <asm/ring0.h>
 #include <printk.h>
 #include <cpu.h>
 
 static char sect_buffer[512];
 
-// channel must be 0 or 1
-// OTHERWISE YOU ARE FUCKING VGA CARD!
 static inline void
 reset_ata(unsigned short port)
 {
@@ -54,10 +53,10 @@ identify_ata(unsigned short port, unsigned char dev)
 void
 ata_init()
 {
-	reset_ata(PRIM_CHNN_CTRL);
-	reset_ata(SCND_CHNN_CTRL);
-	identify_ata(PRIM_CHNN_BASE, ATA_MASTER_DRV);
-	identify_ata(PRIM_CHNN_BASE, ATA_SLAVE_DRV);
-	identify_ata(SCND_CHNN_BASE, ATA_MASTER_DRV);
-	identify_ata(SCND_CHNN_BASE, ATA_SLAVE_DRV);
+	// reset_ata(PRIM_CHNN_CTRL);
+	// reset_ata(SCND_CHNN_CTRL);
+	// identify_ata(PRIM_CHNN_BASE, ATA_MASTER_DRV);
+	// identify_ata(PRIM_CHNN_BASE, ATA_SLAVE_DRV);
+	// identify_ata(SCND_CHNN_BASE, ATA_MASTER_DRV);
+	// identify_ata(SCND_CHNN_BASE, ATA_SLAVE_DRV);
 }

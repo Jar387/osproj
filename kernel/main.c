@@ -4,6 +4,7 @@
 #include <multiboot.h>
 #include <printk.h>
 #include <drivers/char.h>
+#include <drivers/pci.h>
 #include <drivers/block.h>
 #include <mm/mm.h>
 #include <sched.h>
@@ -21,6 +22,7 @@ kmain(struct multiboot_info *info)
 	printk("Setting up hardwares\n");
 	arch_init();
 	mm_init();
+	pci_init();
 	blkdev_load();
 	fs_init();
 	cdev_load();

@@ -4,7 +4,6 @@
 #include <lib/bst.h>
 #include <drivers/char/devmem.h>
 #include <drivers/char/tty.h>
-#include <drivers/char/pci.h>
 #include <drivers/char.h>
 bst_node_t *chardev_root;
 
@@ -19,7 +18,6 @@ cdev_load()
 {
 	init_devmem();
 	init_tty();
-	init_pci();
 }
 
 int
