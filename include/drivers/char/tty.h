@@ -1,8 +1,8 @@
 #ifndef TTY_H
 #define TTY_H
 
-void preinit_tty();
-void init_tty();
+void tty_preinit();
+void tty_init();
 
 int tty_write(short minor, char data);	// for pre-arch_init debug use
 		     // do not abuse :)

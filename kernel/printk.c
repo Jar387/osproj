@@ -49,6 +49,10 @@ static void
 x(int val, int padding)
 {
 	if (val == 0) {
+		if (padding == 0) {
+			puthex(0);
+			return;
+		}
 		for (int j = 0; j < padding; j++) {
 			puthex(0);
 		}
@@ -82,23 +86,38 @@ x(int val, int padding)
 static void
 X(int val, int padding)
 {
-	int i, count = 0;
-	int non_zero_found = 0;
-
-	for (i = 0; i < 8; i++) {
-		int digit = (val & 0xf0000000) >> 28;
-
-		if (digit != 0 || non_zero_found) {
-			putheX(digit);
-			non_zero_found = 1;
-			count++;
+	if (val == 0) {
+		if (padding == 0) {
+			putheX(0);
+			return;
 		}
-
+		for (int j = 0; j < padding; j++) {
+			putheX(0);
+		}
+		return;
+	}
+	int i, first = 0, digcount = 0, startdig = 0, val2 = val;
+	for (i = 0; i < 8; i++) {
+		if (((val & 0xf0000000) >> 28) != 0 && first == 0) {
+			first = 1;
+			startdig = i;
+		}
+		if (first == 1) {
+			digcount++;
+		}
 		val <<= 4;
 	}
-	while (count < padding) {
-		puthex(0);
-		count++;
+	if (padding > digcount) {
+		padding -= digcount;
+		for (; padding > 0; padding--) {
+			putheX(0);
+		}
+	}
+	for (i = 0; i < 8; i++) {
+		if (i >= startdig) {
+			putheX(((val2 & 0xf0000000) >> 28) & 0xF);
+		}
+		val2 <<= 4;
 	}
 }
 

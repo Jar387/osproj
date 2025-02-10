@@ -211,7 +211,6 @@ putchar(char c)
 	int pos = y * VGA_COLUMN + x;
 	pos *= 2;
 	char *vram = (char *) VRAM;
-	bp();
 	vram[pos] = c;
 	vram[pos + 1] = ASSEMB_COLOUR;
 	if (y == VGA_ROW && x == 79) {
@@ -435,7 +434,7 @@ tty_write(short minor, char data)
 }
 
 void
-preinit_tty()
+tty_preinit()
 {
 	struct multiboot_info *info = multiboot_config;
 	VRAM = info->framebuffer_addr + 0xc0000000;
@@ -448,7 +447,7 @@ preinit_tty()
 }
 
 void
-init_tty()
+tty_init()
 {
 	creat_cdev(MAJOR_TTY, NULL, tty_write, NULL);
 	curr_tty = 1;

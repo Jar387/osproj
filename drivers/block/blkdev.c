@@ -2,112 +2,64 @@
 #include <drivers/block/ata.h>
 #include <mm/slab.h>
 #include <stddef.h>
+#include <lib/bst.h>
+#include <errno.h>
 
-static bdev_t *head;
-static bdev_t *tail;
-
-// quick table
-static bdev_t *hda;
-static bdev_t *root_part;
-static bdev_t *last;
+static bst_node_t *blkdev_root;
 
 void
-blkdev_load()
+block_init()
 {
 	ata_init();
 }
 
 int
-creat_bdev(int dev_num, int (*read)(char *, int), int(*write)(char *, int),
-	   int(*ioctl)(long), int(*seek)(long, int))
+creat_bdev(short major, int (*read)(short, char *, int),
+	   int(*write)(short, char *, int), int(*ioctl)(short, long))
 {
-	bdev_t *new_dev = kmalloc(sizeof(bdev_t));
-	if (head == NULL) {
-		head = new_dev;
-		tail = head;
-	} else {
-		tail->next = new_dev;
-		tail = new_dev;
-	}
-	new_dev->dev_num = dev_num;
-	new_dev->read = read;
-	new_dev->write = write;
-	new_dev->ioctl = ioctl;
-	new_dev->seek = seek;
-	new_dev->next = NULL;
-}
-
-static bdev_t *
-search_bdev(int dev)
-{
-	bdev_t *do_dev = head;
-	// try to hit cache
-	if (hda != NULL) {
-		if (dev == hda->dev_num) {
-			return hda;
-		}
-	}
-	if (root_part != NULL) {
-		if (dev == root_part->dev_num) {
-			return root_part;
-		}
-	}
-	if (last != NULL) {
-		if (dev == last->dev_num) {
-			return last;
-		}
-	}
-	// cache not hit
-	if (head == NULL) {
-		return NULL;
-	}
-	while (do_dev->next != NULL) {
-		if (do_dev->dev_num == dev) {
-			last = do_dev;
-			return do_dev;
-		}
-		do_dev = do_dev->next;
-	}
-
-	return NULL;
+	bdev_t *newdev =(bdev_t *) kmalloc(sizeof (*newdev));
+	newdev->major = major;
+	newdev->read = read;
+	newdev->write = write;
+	newdev->ioctl = ioctl;
+	bst_insert(&blkdev_root, newdev, (int) major);
 }
 
 int
-bread(int dev, char *buf, int count)
+bread(short major, short minor, char *buf, int count)
 {
-	bdev_t *bdev = search_bdev(dev);
-	if (bdev != NULL && bdev->read != NULL) {
-		return bdev->read(buf, count);
+	bdev_t *dev = bst_search(blkdev_root, (int) major);
+	if (dev == NULL) {
+		return -ENODEV;
 	}
-	return -1;
+	if (dev->read == NULL) {
+		return -ENODEV;
+	}
+	return (dev->read) (minor, buf, count);
 }
 
 int
-bwrite(int dev, char *buf, int count)
+bwrite(short major, short minor, char *buf, int count)
 {
-	bdev_t *bdev = search_bdev(dev);
-	if (bdev != NULL && bdev->write != NULL) {
-		return bdev->write(buf, count);
+	bdev_t *dev = bst_search(blkdev_root, (int) major);
+	if (dev == NULL) {
+		return -ENODEV;
 	}
-	return -1;
+	if (dev->write == NULL) {
+		return -ENODEV;
+	}
+	return (dev->write) (minor, buf, count);
 }
 
 int
-bioctl(int dev, long cmd)
+bioctl(short major, short minor, long cmd)
 {
-	bdev_t *bdev = search_bdev(dev);
-	if (bdev != NULL && bdev->ioctl != NULL) {
-		return bdev->ioctl(cmd);
+	bdev_t *dev = bst_search(blkdev_root, (int) major);
+	if (dev == NULL) {
+		return -ENODEV;
 	}
-	return -1;
-}
-
-int
-bseek(int dev, long offset, int method)
-{
-	bdev_t *bdev = search_bdev(dev);
-	if (bdev != NULL && bdev->seek != NULL) {
-		return bdev->seek(offset, method);
+	if (dev->ioctl == NULL) {
+		return -ENODEV;
 	}
-	return -1;
+	return (dev->ioctl) (minor, cmd);
 }

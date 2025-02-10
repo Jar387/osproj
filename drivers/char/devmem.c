@@ -48,7 +48,7 @@ devmem_write(short minor, char data)
 }
 
 void
-init_devmem()
+devmem_init()
 {
 	creat_cdev(MAJOR_MEM, devmem_read, devmem_write, NULL);
 	mem_ptr = MEM_DEV_LO;

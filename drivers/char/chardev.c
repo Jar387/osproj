@@ -10,14 +10,14 @@ bst_node_t *chardev_root;
 void
 load_graphic()
 {
-	preinit_tty();
+	tty_preinit();
 }
 
 void
-cdev_load()
+char_init()
 {
-	init_devmem();
-	init_tty();
+	devmem_init();
+	tty_init();
 }
 
 int

@@ -23,9 +23,9 @@ kmain(struct multiboot_info *info)
 	arch_init();
 	mm_init();
 	pci_init();
-	blkdev_load();
+	block_init();
 	fs_init();
-	cdev_load();
+	char_init();
 	pit_init();
 	sched_init();
 	printk("hardware setup done\n");

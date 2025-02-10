@@ -16,7 +16,7 @@ typedef struct {
 
 void load_graphic();
 
-void cdev_load();
+void char_init();
 
 int creat_cdev(short major, int (*read)(short), int(*write)(short, char),
 	       int(*ioctl)(short, long));

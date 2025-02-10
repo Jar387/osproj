@@ -2,20 +2,17 @@
 #define DRIVERS_BLOCK_H
 
 typedef struct bdev_t {
-	int dev_num;
-	int (*read)(char *, int);
-	int (*write)(char *, int);
-	int (*ioctl)(long);
-	int (*seek)(long, int);
-	struct bdev_t *next;
+	short major;
+	int (*read)(short, char *, int);
+	int (*write)(short, char *, int);
+	int (*ioctl)(short, long);
 } bdev_t;
 
-void blkdev_load();
-int creat_bdev(int dev_num, int (*read)(char *, int), int(*write)(char *, int),
-	       int(*ioctl)(long), int(*seek)(long, int));
-int bread(int dev, char *buf, int count);
-int bwrite(int dev, char *buf, int count);
-int bioctl(int dev, long cmd);
-int bseek(int dev, long offset, int method);
+void block_init();
+int creat_bdev(short major, int (*read)(short, char *, int),
+	       int(*write)(short, char *, int), int(*ioctl)(short, long));
+int bread(short major, short minor, char *buf, int count);
+int bwrite(short major, short minor, char *buf, int count);
+int bioctl(short major, short minor, long cmd);
 
 #endif
