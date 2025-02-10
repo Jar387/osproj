@@ -7,6 +7,9 @@
 #define PRIM_CHNN_IRQ 14
 #define SCND_CHNN_IRQ 15
 
+#define PRIM_CHNN_VEC 0x21
+#define SCND_CHNN_VEC 0x22
+
 #define PRIM_CHNN_CTRL 0x3f6
 #define SCND_CHNN_CTRL 0x376
 
@@ -57,6 +60,19 @@
 
 #define ATA_CMD_IDENTIFY 0xec
 
+#define ATA_VALID 1
+#define ATA_INVALID 0
+
+typedef struct {
+	unsigned int valid;
+	unsigned short base_addr;
+	unsigned char device_select;
+	unsigned int sector_count;
+} ata_device_t;
+
 void ata_init();
+
+extern void ata_prim_int();
+extern void ata_scnd_int();
 
 #endif

@@ -15,9 +15,9 @@ block_init()
 
 int
 creat_bdev(short major, int (*read)(short, char *, int),
-	   int(*write)(short, char *, int), int(*ioctl)(short, long))
+	   int (*write)(short, char *, int), int (*ioctl)(short, long))
 {
-	bdev_t *newdev =(bdev_t *) kmalloc(sizeof (*newdev));
+	bdev_t *newdev = (bdev_t *) kmalloc(sizeof(*newdev));
 	newdev->major = major;
 	newdev->read = read;
 	newdev->write = write;

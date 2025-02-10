@@ -1,0 +1,10 @@
+recode IRQs to avoid conflict
+IRQ 0~14: cpu exception
+IRQ 32: PIT timer
+IRQ 33: ata channel 0
+IRQ 34: ata channel 1
+
+IOAPIC pins
+pin #2: PIT timer
+pin #14: ata channel 0
+pin #15: ata channel 1

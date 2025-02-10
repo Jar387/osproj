@@ -127,13 +127,23 @@ sched_int:
 .global divide_error, debug, nmi, int3, overflow, bounds
 .global opcode, device_not_present, double_fault, i387_overrun, illegal_tss, illegal_segment
 .global stack_overflow, general_protect, page_fault, reserved
-.global pit_int
+.global pit_int, ata_prim_int, ata_scnd_int
 
 pit_int:
 	cli
 	movl %esp, (esp_swap)
 	movl (worker_stack_top), %esp # switch to scheduler working stack
 	jmp sched_int
+
+ata_prim_int:
+	cli
+	pushl $do_ata_int
+	jmp no_err_code
+
+ata_scnd_int:
+	cli
+	pushl $do_ata_int
+	jmp no_err_code
 
 divide_error:
 	cli

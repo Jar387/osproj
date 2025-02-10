@@ -39,6 +39,7 @@ void
 init()
 {
 	printk("running init\n");
+	test();
 	for (;;) {
 		hlt();
 	}
