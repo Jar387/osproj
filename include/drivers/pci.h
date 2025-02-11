@@ -23,4 +23,7 @@ int get_device_by_class(unsigned char classcode, unsigned char subclass,
 pci_device_t *get_device_by_id(unsigned char bus, unsigned char device,
 			       unsigned char function);
 
+#define CLASSCODE_MASS_STORAGE 0x1
+#define SUBCLASS_IDE_CONTROLLER 0x1
+
 #endif

@@ -4,10 +4,13 @@
 #include <printk.h>
 #include <cpu.h>
 #include <apic.h>
+#include <mm/buddy.h>
 
-static char sect_buffer[512];
+static char *sect_buffer;
 
 static ata_device_t ata_device_list[4];
+static unsigned short bus_master_port[2];
+char *prdt;
 
 static void
 identify_ata(unsigned short port, unsigned char dev, ata_device_t * target)
@@ -58,28 +61,22 @@ identify_ata(unsigned short port, unsigned char dev, ata_device_t * target)
 void
 test()
 {
-	outb_p(PRIM_SECT, 1);
-	outb_p(PRIM_LBALOW, 2);
-	outb_p(PRIM_LBAMID, 0);
-	outb_p(PRIM_LBAHI, 0);
-	outb_p(PRIM_DRIVE, 0xe0);
-	outb_p(PRIM_CMD, 0x20);
 }
 
 void
 do_ata_int()
 {
+	outb_p(bus_master_port[0], 8);
 	printk("ATA INT!\n");
+	printk("%x %x\n", inb(bus_master_port[0] + 2), inb(PRIM_STATUS));
 	unsigned short *buf = (unsigned short *) sect_buffer;
-	for (int i = 0; i < 256; i++) {
-		buf[i] = inw(PRIM_CHNN_BASE + ATA_DATA);
-		printk("%x\n", buf[i]);
-	}
+	printk("%x\n", buf[255]);
 }
 
 void
 ata_init()
 {
+	sect_buffer = (char *) palloc(ZONE_KERNEL, 1);
 	printk("scanning ATA bus\n");
 	identify_ata(PRIM_CHNN_BASE, ATA_MASTER_DRV, &(ata_device_list[0]));
 	identify_ata(PRIM_CHNN_BASE, ATA_SLAVE_DRV, &(ata_device_list[1]));
@@ -95,4 +92,33 @@ ata_init()
 		set_int_gate(SCND_CHNN_VEC, &ata_scnd_int);
 		ioapic_enable(SCND_CHNN_VEC, SCND_CHNN_IRQ);
 	}
+	pci_device_t *devices[2];
+	int num =
+	    get_device_by_class(CLASSCODE_MASS_STORAGE, SUBCLASS_IDE_CONTROLLER,
+				devices, 2);
+	if (num == 0) {
+		printk("no DMA support\n");
+	}
+	if (num >= 1) {
+		bus_master_port[0] = (devices[0]->bar[4]) & 0xFFFC;
+	}
+	if (num == 2) {
+		bus_master_port[1] = (devices[1]->bar[4]) & 0xFFFC;
+	}
+	// PRDT test
+	prdt = palloc(ZONE_KERNEL, 1);
+	int *prdt_i = (int *) prdt;
+	prdt_i[0] = ((int) sect_buffer) - 0xC0000000;
+	prdt_i[1] = 0x80000200;
+	prdt -= 0xc0000000;
+	outl_p(bus_master_port[0] + 4, prdt);
+	outb_p(bus_master_port[0], 8);
+	outb_p(bus_master_port[0] + 2, 0);
+	outb_p(PRIM_SECT, 1);
+	outb_p(PRIM_LBALOW, 0);
+	outb_p(PRIM_LBAMID, 0);
+	outb_p(PRIM_LBAHI, 0);
+	outb_p(PRIM_DRIVE, 0xe0);
+	outb_p(PRIM_CMD, 0xc8);
+	outb_p(bus_master_port[0], 9);
 }
