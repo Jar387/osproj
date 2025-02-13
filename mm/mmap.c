@@ -47,8 +47,8 @@ map_page(pde_t * pdbr, void *phy, void *virt, unsigned char perm,
 	}
 	if (pde->present == 0) {
 		// create page
-		pte_base = palloc(ZONE_KERNEL, 1);	// this is page aligned
-		memset(pte_base, 0, 4096);
+		pte_base = palloc(ZONE_KERNEL, PAGE_SIZE);	// this is page aligned
+		memset(pte_base, 0, PAGE_SIZE);
 		pde->present = 1;
 		pde->rw = 1;	// page dir allow all access
 		pde->us = 1;	// limit perm in page table

@@ -274,7 +274,7 @@ tty_write(short minor, char data)
 		fores[curr_tty] = fore;
 		backs[curr_tty] = back;
 		if (ttys[data] == NULL) {
-			ttys[data] = (char *) palloc(ZONE_KERNEL, 1);
+			ttys[data] = (char *) palloc(ZONE_KERNEL, PAGE_SIZE);
 			memset(ttys[data], 0, 2 * VGA_COLUMN * (VGA_ROW + 1));
 		}
 		curr_tty = data;
@@ -451,7 +451,7 @@ tty_init()
 {
 	creat_cdev(MAJOR_TTY, NULL, tty_write, NULL);
 	curr_tty = 1;
-	ttys[1] = (char *) palloc(ZONE_KERNEL, 1);
+	ttys[1] = (char *) palloc(ZONE_KERNEL, PAGE_SIZE);
 	memset(fores, DEFAULT_FORE, sizeof (fores));
 	memset(backs, DEFAULT_BACK, sizeof (backs));
 }

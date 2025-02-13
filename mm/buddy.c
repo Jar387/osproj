@@ -36,6 +36,10 @@ page_init(unsigned int total_mem)
 void *
 palloc(int zone, unsigned int size)
 {
+	size = size / PAGE_SIZE;
+	if ((size % 4096) != 0) {
+		size++;
+	}
 	page_t *ptr;
 	page_t *head_ptr;
 	unsigned int searchlen;

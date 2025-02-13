@@ -76,7 +76,7 @@ do_ata_int()
 void
 ata_init()
 {
-	sect_buffer = (char *) palloc(ZONE_KERNEL, 1);
+	sect_buffer = (char *) palloc(ZONE_KERNEL, PAGE_SIZE);
 	printk("scanning ATA bus\n");
 	identify_ata(PRIM_CHNN_BASE, ATA_MASTER_DRV, &(ata_device_list[0]));
 	identify_ata(PRIM_CHNN_BASE, ATA_SLAVE_DRV, &(ata_device_list[1]));
@@ -106,7 +106,7 @@ ata_init()
 		bus_master_port[1] = (devices[1]->bar[4]) & 0xFFFC;
 	}
 	// PRDT test
-	prdt = palloc(ZONE_KERNEL, 1);
+	prdt = palloc(ZONE_KERNEL, PAGE_SIZE);
 	int *prdt_i = (int *) prdt;
 	prdt_i[0] = ((int) sect_buffer) - 0xC0000000;
 	prdt_i[1] = 0x80000200;

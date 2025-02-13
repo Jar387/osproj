@@ -33,7 +33,7 @@ new_tss(void *entry)
 	new->int_stack.cs = 2 << 2;
 	new->int_stack.eflags = 0x282;
 	new->int_stack.eip = (reg32) entry;
-	new->kernel_stack = palloc(ZONE_KERNEL, 1) + 0xfff;
+	new->kernel_stack = palloc(ZONE_KERNEL, PAGE_SIZE) + 0xfff;
 	new->generic_stack.cr3 = 0;
 	new->generic_stack.ds = 2 << 3;
 	new->generic_stack.es = 2 << 3;
@@ -51,7 +51,7 @@ sched_init()
 		memset(tss_list + i, 0, sizeof (task_struct_t));
 	}
 	new_tss(init);
-	worker_stack_top = palloc(ZONE_KERNEL, 1) + 0xfff;
+	worker_stack_top = palloc(ZONE_KERNEL, PAGE_SIZE) + 0xfff;
 }
 
 static void

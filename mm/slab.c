@@ -147,7 +147,7 @@ kfree(void *addr)
 static slab_t *
 creat_slab(unsigned int obj_count)
 {
-	slab_t *slab = palloc(ZONE_KERNEL, NR_SLAB_PAGE);
+	slab_t *slab = palloc(ZONE_KERNEL, NR_SLAB_PAGE * PAGE_SIZE);
 	slab->free_count = obj_count;
 	slab->next = NULL;
 	free_t *freeidx = (free_t *) (slab + 1);

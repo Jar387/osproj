@@ -7,7 +7,7 @@
 #define KMEM_FLAG_COMFORT 1
 #define KMEM_FLAG_STRICT 2
 
-#define SLAB_SIZE 4096*NR_SLAB_PAGE
+#define SLAB_SIZE PAGE_SIZE*NR_SLAB_PAGE
 #define NR_SLAB_PAGE 1
 
 void slab_init();

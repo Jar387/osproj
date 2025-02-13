@@ -3,6 +3,8 @@
 
 #include <stddef.h>
 
+#define PAGE_SIZE 4096
+
 void page_init(unsigned int);
 
 void *palloc(int zone, unsigned int size);	// kernel zone returns mapped address, \
