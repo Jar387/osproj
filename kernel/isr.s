@@ -217,6 +217,9 @@ general_protect:
 
 page_fault:
 	cli
+	xchgw %bx, %bx
+	pushl 4(%esp)
+	popl 0xa(%esp)
 	pushl $do_page_fault
 	jmp err_code
 

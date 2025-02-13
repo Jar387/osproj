@@ -36,10 +36,11 @@ page_init(unsigned int total_mem)
 void *
 palloc(int zone, unsigned int size)
 {
-	size = size / PAGE_SIZE;
-	if ((size % 4096) != 0) {
-		size++;
+	unsigned int sz = size / PAGE_SIZE;
+	if ((size % PAGE_SIZE) != 0) {
+		sz++;
 	}
+	size = sz;
 	page_t *ptr;
 	page_t *head_ptr;
 	unsigned int searchlen;
@@ -85,6 +86,10 @@ palloc(int zone, unsigned int size)
 void
 pfree(void *addr, unsigned int len, unsigned int zone)
 {
+	len = len / PAGE_SIZE;
+	if ((len % PAGE_SIZE) != 0) {
+		len++;
+	}
 	page_t *ptr;
 	if (zone == ZONE_USER) {
 		// user space

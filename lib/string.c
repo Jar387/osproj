@@ -11,9 +11,8 @@ void
 memset(void *dst, unsigned int c, unsigned int size)
 {
 	__asm__ volatile ("\n"
-			  "shrl $2, %%ecx\n"
 			  "cld\n"
-			  "rep\n" "stosl\n"::"D" (dst), "a"(c), "c"(size)
+			  "rep\n" "stosb\n"::"D" (dst), "a"(c), "c"(size)
 			  :);
 }
 
@@ -24,11 +23,10 @@ memcmp(void *dst, void *src, unsigned int size)
 {
 	unsigned int result;
 	__asm__ volatile ("\n"
-			  "shrl $2, %%ecx\n"
 			  "xor %%eax, %%eax\n"
 			  "cld\n"
 			  "rep\n"
-			  "cmpsl\n"
+			  "cmpsb\n"
 			  "je 1f\n" "incl %%eax\n" "1:\n":"=a" (result)
 			  :"S"(src), "D"(dst), "c"(size)
 			  :);

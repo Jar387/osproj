@@ -4,13 +4,14 @@
 typedef struct {
 	unsigned int size;
 	unsigned int data_size;
-	void *data;
-	void *start;
-	void *end;
+	int dirty;
+	char *data;
+	char *start;
+	char *end;
 } fifo_t;
 
 fifo_t *alloc_fifo(unsigned int size, unsigned int data_size);
-void fifo_enqueue(fifo_t * fifo, void *data);
-void fifo_dequeue(fifo_t * fifo, void *buffer);
+int fifo_enqueue(fifo_t * fifo, void *data);
+int fifo_dequeue(fifo_t * fifo, void *buffer);
 
 #endif

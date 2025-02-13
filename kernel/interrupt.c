@@ -86,8 +86,9 @@ do_general_protect(unsigned int err_code)
 }
 
 void
-do_page_fault(unsigned int err_code)
+do_page_fault(unsigned int *err_code)
 {
+	printk("last executed code %p\n", *err_code);
 	panic("page fault caught");
 }
 
