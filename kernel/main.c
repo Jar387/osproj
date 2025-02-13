@@ -23,7 +23,7 @@ kmain(struct multiboot_info *info)
 	arch_init();
 	mm_init();
 	pci_init();
-	block_init();
+	// block_init();
 	fs_init();
 	char_init();
 	pit_init();
@@ -39,7 +39,6 @@ void
 init()
 {
 	printk("running init\n");
-	test();
 	for (;;) {
 		hlt();
 	}

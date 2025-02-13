@@ -4,6 +4,7 @@
 #include <lib/bst.h>
 #include <drivers/char/devmem.h>
 #include <drivers/char/tty.h>
+#include <drivers/char/serial.h>
 #include <drivers/char.h>
 bst_node_t *chardev_root;
 
@@ -18,6 +19,7 @@ char_init()
 {
 	devmem_init();
 	tty_init();
+	serial_init();
 }
 
 int

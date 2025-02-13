@@ -15,6 +15,11 @@
 .long FLAGS
 .long CHECKSUM
 
+.section .data
+.global _biosdata
+_biosdata: # save BDA against overwrite of PG setup @ phy 0x0
+.skip 0xa0
+
 .section .bss, "aw", @nobits
 .global stack_bottom
 stack_bottom:
@@ -26,6 +31,14 @@ stack_top:
 .type _start, @function
 _start:
 	cli # we don't want any ints here
+	# first save BDA
+	mov $0x400, %esi
+	mov $_biosdata, %edi
+	subl $0xc0000000, %edi # data section is mapped to higher half, but we hasn't setup PG yet
+	mov $0xa0/4, %ecx
+	cld
+	rep
+	movsl
 	# setup paging
 	# setup kernel page table at phy:0x0
 	# map 0x0-0x3fffffff --> 0xc0000000-0xffffffff
