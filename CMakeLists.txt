@@ -37,7 +37,7 @@ set_target_properties(kernel.out PROPERTIES LINKER_LANGUAGE C)
 add_custom_target(run
     COMMAND cp -f kernel.out mnt/boot
     COMMAND sync
-    COMMAND qemu-system-i386 -drive file=disk.img,format=raw,index=0,media=disk -no-reboot -no-shutdown -cpu host -enable-kvm -serial stdio
+    COMMAND qemu-system-i386 -drive file=disk.img,format=raw,index=0,media=disk -no-reboot -no-shutdown -cpu host -enable-kvm
     DEPENDS kernel.out
 )
 
